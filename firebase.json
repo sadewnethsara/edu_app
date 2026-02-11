@@ -1,0 +1,28 @@
+{
+    "firestore": {
+        "rules": "firestore.rules"
+    },
+    "storage": {
+        "rules": "storage.rules"
+    },
+    "flutter": {
+        "platforms": {
+            "android": {
+                "default": {
+                    "projectId": "math-world-01",
+                    "appId": "1:1099003660019:android:a6389fbc0a769be1839986",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            },
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "math-world-01",
+                    "configurations": {
+                        "android": "1:1099003660019:android:a6389fbc0a769be1839986",
+                        "ios": "1:1099003660019:ios:91b23ed1c03b4950839986"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,167 @@
+rules_version = '2';
+
+// Craft rules based on data in your Firestore database
+// allow write: if firestore.get(
+//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper function to check if user is super admin
+    function isSuperAdmin() {
+      return request.auth != null && 
+             request.auth.token.role == 'super_admin';
+    }
+    
+    // Helper function to check if user is admin or super admin
+    function isAdmin() {
+      return request.auth != null && 
+             (request.auth.token.role == 'admin' ||
+              request.auth.token.role == 'super_admin');
+    }
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to validate image files
+    function isValidImage() {
+      return request.resource.size < 5 * 1024 * 1024 // Max 5MB
+             && request.resource.contentType.matches('image/.*');
+    }
+    
+    // Helper function to validate PDF files
+    function isValidPDF() {
+      return request.resource.size < 20 * 1024 * 1024 // Max 20MB
+             && request.resource.contentType == 'application/pdf';
+    }
+    
+    // Helper function to validate video files
+    function isValidVideo() {
+      return request.resource.size < 100 * 1024 * 1024 // Max 100MB
+             && request.resource.contentType.matches('video/.*');
+    }
+    
+    // Helper function to validate document files (PDF, DOC, etc.)
+    function isValidDocument() {
+      return request.resource.size < 50 * 1024 * 1024 // Max 50MB
+             && (request.resource.contentType == 'application/pdf' ||
+                 request.resource.contentType.matches('application/msword.*') ||
+                 request.resource.contentType.matches('application/vnd.openxmlformats.*'));
+    }
+    
+    // Helper function to validate font files
+    function isValidFont() {
+      return request.resource.size < 5 * 1024 * 1024 // Max 5MB
+             && (request.resource.contentType.matches('font/.*') ||
+                 request.resource.contentType.matches('application/font.*') ||
+                 request.resource.contentType == 'application/x-font-ttf' ||
+                 request.resource.contentType == 'application/x-font-woff' ||
+                 request.resource.contentType == 'application/x-font-woff2');
+    }
+    
+    // Avatars folder rules
+    match /avatars/{fileName} {
+      // Allow all authenticated users to read avatars
+      allow read: if isAuthenticated();
+      
+      // Only super admins can upload avatars
+      allow create: if isSuperAdmin() && isValidImage();
+      
+      // Only super admins can delete avatars
+      allow delete: if isSuperAdmin();
+      
+      // Only super admins can update avatars
+      allow update: if isSuperAdmin() && isValidImage();
+    }
+    
+    // Fonts folder rules
+    match /fonts/{languageCode}/{fileName} {
+      // Allow all authenticated users to read fonts
+      allow read: if isAuthenticated();
+      
+      // Only super admins can upload fonts
+      allow create: if isSuperAdmin() && isValidFont();
+      
+      // Only super admins can delete fonts
+      allow delete: if isSuperAdmin();
+      
+      // Only super admins can update fonts
+      allow update: if isSuperAdmin() && isValidFont();
+    }
+    
+    // Past Papers folder rules
+    match /past-papers/{subjectId}/{fileName} {
+      // Allow all authenticated users to read past papers
+      allow read: if isAuthenticated();
+      
+      // Only admins and super admins can upload past papers
+      allow create: if isAdmin() && isValidPDF();
+      
+      // Only admins and super admins can delete past papers
+      allow delete: if isAdmin();
+      
+      // Only admins and super admins can update past papers
+      allow update: if isAdmin() && isValidPDF();
+    }
+    
+    // Curriculum images folder rules (for grades, subjects, etc.)
+    match /curriculum/{allPaths=**} {
+      // Allow all authenticated users to read curriculum images
+      allow read: if isAuthenticated();
+      
+      // Only admins and super admins can upload curriculum images
+      allow create: if isAdmin() && isValidImage();
+      
+      // Only admins and super admins can delete curriculum images
+      allow delete: if isAdmin();
+      
+      // Only admins and super admins can update curriculum images
+      allow update: if isAdmin() && isValidImage();
+    }
+    
+    // Lessons content folder rules
+    match /lessons/{lessonId}/{contentType}/{fileName} {
+      // Allow all authenticated users to read lesson content
+      allow read: if isAuthenticated();
+      
+      // Only admins can upload lesson content
+      allow create: if isAdmin() && (isValidVideo() || isValidDocument());
+      
+      // Only admins can delete lesson content
+      allow delete: if isAdmin();
+      
+      // Only admins can update lesson content
+      allow update: if isAdmin() && (isValidVideo() || isValidDocument());
+    }
+    
+    // Subtopics content folder rules
+    match /subtopics/{subtopicId}/{contentType}/{fileName} {
+      // Allow all authenticated users to read subtopic content
+      allow read: if isAuthenticated();
+      
+      // Only admins can upload subtopic content
+      allow create: if isAdmin() && (isValidVideo() || isValidDocument());
+      
+      // Only admins can delete subtopic content
+      allow delete: if isAdmin();
+      
+      // Only admins can update subtopic content
+      allow update: if isAdmin() && (isValidVideo() || isValidDocument());
+    }
+    
+    match /reply_images/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null; // Temporarily relaxed for debugging
+    }
+    
+    match /post_images/{userId}/{imageId} {
+      allow read: if true; // Public read for post images
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /communities/{communityId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null; 
+    }
+  }
+}

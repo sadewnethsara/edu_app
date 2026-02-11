@@ -1,0 +1,329 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is admin or super_admin
+    function isAdmin() {
+      return request.auth != null && 
+             (request.auth.token.role == 'admin' || request.auth.token.role == 'super_admin');
+    }
+    
+    // Helper function to check if user is super_admin
+    function isSuperAdmin() {
+      return request.auth != null && request.auth.token.role == 'super_admin';
+    }
+    
+    // Helper function to check if user is viewer or higher (includes user, viewer, admin, super_admin)
+    function isViewerOrHigher() {
+      return request.auth != null && 
+             (request.auth.token.role == 'user' || 
+              request.auth.token.role == 'viewer' || 
+              request.auth.token.role == 'admin' || 
+              request.auth.token.role == 'super_admin');
+    }
+    
+    // --- Rule for your Main App Data ---
+    match /publicData/{docId} {
+      // ALLOW READ: Any authenticated user (including students with 'user' role)
+      allow read: if isViewerOrHigher();
+      
+      // ALLOW WRITE: Only admins and super_admins
+      allow write: if isAdmin();
+    }
+    
+    // --- Rule for Grades, Subjects, Lessons, Subtopics, and Content ---
+    match /grades/{gradeId} {
+      // ALLOW READ: Anyone can read grades (needed for onboarding)
+      allow read: if true;
+      
+      // ALLOW WRITE: Only admins or super_admins
+      allow write: if isAdmin();
+      
+      // Subjects subcollection
+      match /subjects/{subjectId} {
+        allow read: if isAuthenticated();
+        allow write: if isAdmin();
+        
+        // Lessons subcollection
+        match /lessons/{lessonId} {
+          allow read: if isAuthenticated();
+          allow write: if isAdmin();
+          
+          // Content subcollections (theory, examples, practice, videos)
+          match /content/{contentType} {
+            allow read: if isAuthenticated();
+            allow write: if isAdmin();
+            
+            // Individual content items
+            match /{contentId} {
+              allow read: if isAuthenticated();
+              allow write: if isAdmin();
+            }
+          }
+          
+          // Subtopics subcollection
+          match /subtopics/{subtopicId} {
+            allow read: if isAuthenticated();
+            allow write: if isAdmin();
+          }
+        }
+      }
+    }
+    
+    // --- Rule for User Profile Data ---
+    match /users/{userId} {
+      // ALLOW READ:
+      // Any authenticated user can read user profiles (needed for Leaderboard & Ranks & Search)
+      // We explicitly allow 'list' to support search queries like "users where displayName >= X"
+      allow get: if isAuthenticated();
+      allow list: if isAuthenticated();
+      
+      // ALLOW UPDATE:
+      // Users can update their own document (but not their role)
+      // Anyone can update counts/points for social features
+      // Admins and super_admins can update any field
+      allow update: if (request.auth.uid == userId && 
+                        request.resource.data.role == resource.data.role) 
+                    || (isAuthenticated() && 
+                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['followersCount', 'followingCount', 'points']))
+                    || isAdmin();
+      
+      // ALLOW CREATE:
+      // Users can create their own document during signup
+      // Admins can create any user document
+      allow create: if (request.auth.uid == userId) || isAdmin();
+      
+      // ALLOW DELETE:
+      // Only admins or super_admins can delete users
+      allow delete: if isAdmin();
+      
+      // Subcollections for user data - Keep these private for now
+      match /preferences/{document=**} {
+        allow read, write: if request.auth.uid == userId;
+      }
+      
+      match /progress/{document=**} {
+        allow read, write: if request.auth.uid == userId;
+      }
+      
+      match /streaks/{document=**} {
+        allow read, write: if request.auth.uid == userId;
+      }
+
+      match /favorites/{postId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+
+      match /hidden_posts/{postId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+
+      // Following: User A follows User B
+      match /following/{targetUserId} {
+        allow read: if isAuthenticated();
+        allow write: if request.auth.uid == userId; // Only owner can follow/unfollow
+      }
+
+      // Followers: User B is followed by User A
+      match /followers/{followerId} {
+        allow read: if isAuthenticated();
+        allow write: if request.auth.uid == followerId; // Only the follower can add/remove themselves
+      }
+
+      // Notifications: User A can write to User B's notifications
+      match /notifications/{notificationId} {
+        allow read: if request.auth.uid == userId; // Only owner can read their notifications
+        allow create: if isAuthenticated(); // Any auth user can send a notification
+        allow update, delete: if request.auth.uid == userId; // Owner can mark read/delete
+      }
+    }
+    
+    // --- Rule for Curriculum by Language ---
+    match /curricula/{languageCode} {
+      allow read: if true;
+      allow write: if isAdmin();
+      
+      // Grades subcollection
+      match /grades/{gradeId} {
+        allow read: if true;
+        allow write: if isAdmin();
+        
+        // Subjects subcollection
+        match /subjects/{subjectId} {
+          allow read: if isAuthenticated();
+          allow write: if isAdmin();
+          
+          // Lessons subcollection
+          match /lessons/{lessonId} {
+            allow read: if isAuthenticated();
+            allow write: if isAdmin();
+            
+            // Subtopics subcollection
+            match /subtopics/{subtopicId} {
+              allow read: if isAuthenticated();
+              allow write: if isAdmin();
+            }
+          }
+        }
+      }
+    }
+    
+    // --- Rule for Languages ---
+    match /languages/{languageCode} {
+      // Anyone can read available languages (needed for onboarding)
+      allow read: if true;
+      // Only super admins can modify languages
+      allow write: if isSuperAdmin();
+    }
+    
+    // --- Rule for Curriculum Labels ---
+    match /curriculumLabels/{languageCode} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+    
+    // --- Rule for Language Fonts ---
+    match /languageFonts/{languageCode} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+    
+    // --- Rule for Past Papers ---
+    match /pastPapers/{paperId} {
+      // ALLOW READ: Any authenticated user (students can view/download past papers)
+      allow read: if isAuthenticated();
+      
+      // ALLOW WRITE: Only admins and super_admins can add/edit/delete papers
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // --- Rule for Avatars ---
+    match /avatars/{avatarId} {
+      // Users can read avatars to select for their profile
+      allow read: if isAuthenticated();
+      // Only super admins can manage avatars
+      allow write: if isSuperAdmin();
+    }
+    
+    // --- Rule for User Achievements/Badges ---
+    match /achievements/{achievementId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    match /userAchievements/{userId} {
+      allow read: if (request.auth.uid == userId) || isAdmin();
+      allow write: if (request.auth.uid == userId) || isAdmin();
+      
+      match /{achievementId} {
+        allow read: if (request.auth.uid == userId) || isAdmin();
+        allow write: if (request.auth.uid == userId) || isAdmin();
+      }
+    }
+
+    // --- Rule for Posts (Social Feed) ---
+    match /posts/{postId} {
+      // ALLOW READ: Any authenticated user can read posts (public feed)
+      allow read: if isAuthenticated();
+      
+      // ALLOW CREATE: Any authenticated user can create a post
+      allow create: if isAuthenticated();
+      
+      // ALLOW UPDATE: Author (for content) or Any User (for updating aggregated counters like voteCounts - requires careful validation)
+      // For simplicity in this MVP, we are using transactions to update counters.
+      // We allow any authenticated user to update the post document for voting purposes (counters),
+      // IDEALLY we should validate that only specific fields (counters) are changing, but for now:
+      allow update: if isAuthenticated(); 
+      // allow update: if isAuthenticated() && (resource.data.authorId == request.auth.uid || isAdmin());
+      
+      // ALLOW DELETE: Only the author or admins
+      allow delete: if isAuthenticated() && 
+                            (resource.data.authorId == request.auth.uid || isAdmin());
+                            
+      // Subcollections: votes
+      match /votes/{userId} {
+         allow read: if isAuthenticated();
+         allow write: if isAuthenticated() && request.auth.uid == userId;
+      }
+      
+      // Subcollections: likes
+      match /likes/{userId} {
+         allow read: if isAuthenticated();
+         allow write: if isAuthenticated() && request.auth.uid == userId;
+      }
+      
+      // Subcollections: replies
+      match /replies/{replyId} {
+         allow read: if isAuthenticated();
+         allow create: if isAuthenticated();
+         
+         // ALLOW UPDATE: 
+         // 1. Author or Admin (full update)
+         // 2. Any User (increment/decrement helpfulCount)
+         // 3. Post Author (official helpful mark)
+         allow update: if isAuthenticated() && (
+           resource.data.authorId == request.auth.uid || 
+           isAdmin() ||
+           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['helpfulCount']) ||
+           (get(/databases/$(database)/documents/posts/$(postId)).data.authorId == request.auth.uid && 
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['helpfulCount', 'isMarkedHelpful']))
+         );
+         
+         allow delete: if isAuthenticated() && (resource.data.authorId == request.auth.uid || isAdmin());
+         
+         // Nested likes on replies
+         match /likes/{userId} {
+            allow read: if isAuthenticated();
+            allow write: if isAuthenticated() && request.auth.uid == userId;
+         }
+
+         // Nested helpful markers on replies
+         match /helpful/{userId} {
+            allow read: if isAuthenticated();
+            allow write: if isAuthenticated() && request.auth.uid == userId;
+         }
+      }
+    }
+
+    // --- Rule for Tags ---
+    match /tags/{tagId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+
+    // --- Rule for Communities ---
+    match /communities/{communityId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      // Allow update for creator, admins, or when memberCount is being incremented (transactional)
+      allow update: if isAuthenticated(); 
+      allow delete: if isAuthenticated() && (resource.data.creatorId == request.auth.uid || isAdmin());
+
+      match /members/{userId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && request.auth.uid == userId;
+      }
+    }
+
+    // --- Rule for Reports ---
+    match /reports/{reportId} {
+      allow create: if isAuthenticated();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // --- Collection Group Queries ---
+    match /{path=**}/lessons/{lessonId} {
+      allow read: if isAuthenticated();
+    }
+
+    match /{path=**}/members/{userId} {
+      allow read: if isAuthenticated();
+    }
+  }
+}

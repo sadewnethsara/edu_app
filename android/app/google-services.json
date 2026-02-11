@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1099003660019",
+    "project_id": "math-world-01",
+    "storage_bucket": "math-world-01.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1099003660019:android:a6389fbc0a769be1839986",
+        "android_client_info": {
+          "package_name": "com.nethsara.math"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1099003660019-g7q61bfjdoin0oigsd7hs0s397lm7og0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nethsara.math",
+            "certificate_hash": "5ddefd7048457582cbd9e294fee3037ad4b96181"
+          }
+        },
+        {
+          "client_id": "1099003660019-96pai0qdt5s847ld94ggk9rh4nm4d6mm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtTm0Uu9WT5U1Sg-l6DiDeuuhEwlEXwmk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1099003660019-96pai0qdt5s847ld94ggk9rh4nm4d6mm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1099003660019-4u2vgsp4ai23mdtju5b10u3ao3mppnqs.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.nethsara.math"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

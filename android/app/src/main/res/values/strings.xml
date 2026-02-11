@@ -1,0 +1,4 @@
+<resources>
+    <string name="flame_icon">Flame Icon</string>
+    <string name="widget_description">Shows your current learning streak.</string>
+</resources>
