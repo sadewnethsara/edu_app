@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:math/data/models/subject_model.dart';
-import 'package:math/widgets/standard_bottom_sheet.dart';
+import 'package:math/core/models/subject_model.dart';
+import 'package:math/core/widgets/standard_bottom_sheet.dart';
 
 class SubjectBottomSheet extends StatelessWidget {
   final String? selectedSubjectId;

@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:math/data/models/user_model.dart';
+import 'package:math/core/models/user_model.dart';
 import 'package:math/features/social/feed/services/social_service.dart';
 import 'package:math/features/social/shared/widgets/user_profile_bottom_sheet.dart';
-import 'package:math/widgets/standard_bottom_sheet.dart';
+import 'package:math/core/widgets/standard_bottom_sheet.dart';
 
 enum UserListType { followers, following }
 

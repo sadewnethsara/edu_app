@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:math/features/social/feed/models/post_model.dart';
-import 'package:math/router/app_router.dart';
-import 'package:math/services/auth_service.dart';
-import 'package:math/services/logger_service.dart';
+import 'package:math/core/models/post_model.dart';
+import 'package:math/core/router/app_router.dart';
+import 'package:math/core/services/auth_service.dart';
+import 'package:math/core/services/logger_service.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:math/features/social/feed/widgets/tweet_post_widget.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:math/screens/social_settings_screen.dart';
-import 'package:math/services/api_service.dart';
+import 'package:math/features/settings/presentation/screens/social_settings_screen.dart';
+import 'package:math/core/services/api_service.dart';
 import 'package:go_router/go_router.dart';
-import 'package:math/utils/avatar_color_generator.dart';
+import 'package:math/core/utils/avatar_color_generator.dart';
 import 'package:math/features/social/shared/widgets/user_profile_bottom_sheet.dart';
 import 'package:math/features/social/community/widgets/community_filter_bottom_sheet.dart';
 

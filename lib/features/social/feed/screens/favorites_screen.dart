@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:math/features/social/feed/models/post_model.dart';
+import 'package:math/core/models/post_model.dart';
 import 'package:math/features/social/feed/services/social_service.dart';
 import 'package:math/features/social/feed/widgets/tweet_post_widget.dart';
-import 'package:math/services/auth_service.dart';
+import 'package:math/core/services/auth_service.dart';
 import 'package:provider/provider.dart';
-import 'package:math/router/app_router.dart';
+import 'package:math/core/router/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:animate_do/animate_do.dart';
 

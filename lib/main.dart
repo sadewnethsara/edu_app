@@ -6,21 +6,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:math/l10n/app_localizations.dart';
-import 'package:math/router/app_router.dart';
-import 'package:math/services/auth_service.dart';
-import 'package:math/services/language_service.dart';
-import 'package:math/services/streak_service.dart';
-import 'package:math/services/theme_service.dart';
-import 'package:math/theme/app_theme.dart';
+import 'package:math/core/router/app_router.dart';
+import 'package:math/core/services/auth_service.dart';
+import 'package:math/core/services/language_service.dart';
+import 'package:math/core/services/streak_service.dart';
+import 'package:math/core/services/theme_service.dart';
+import 'package:math/core/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
-import 'package:math/services/network_service.dart';
-import 'package:math/widgets/offline_banner.dart';
-import 'package:math/services/app_usage_service.dart';
-import 'package:math/services/continue_learning_service.dart';
-import 'package:math/services/zen_mode_service.dart';
+import 'package:math/core/services/network_service.dart';
+import 'package:math/core/widgets/offline_banner.dart';
+import 'package:math/core/services/app_usage_service.dart';
+import 'package:math/core/services/continue_learning_service.dart';
+import 'package:math/core/services/zen_mode_service.dart';
 import 'package:math/features/social/feed/services/cache_service.dart';
-import 'package:math/services/settings_service.dart';
+import 'package:math/core/services/settings_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

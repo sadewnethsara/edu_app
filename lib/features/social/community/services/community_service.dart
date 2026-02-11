@@ -4,9 +4,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:math/features/social/community/models/community_model.dart';
 import 'package:math/features/social/community/models/community_member_model.dart';
 import 'package:math/features/social/community/models/community_resource_model.dart';
-import 'package:math/features/social/feed/models/post_model.dart';
+import 'package:math/core/models/post_model.dart';
 import 'package:math/features/social/feed/services/social_service.dart';
-import 'package:math/services/logger_service.dart';
+import 'package:math/core/services/logger_service.dart';
 
 class CommunityService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

@@ -1,8 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:math/features/social/feed/models/post_model.dart';
-import 'package:math/services/logger_service.dart';
+import 'package:math/core/models/post_model.dart';
+import 'package:math/core/services/logger_service.dart';
 
 class CacheService {
   static final CacheService _instance = CacheService._internal();

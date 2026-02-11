@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:math/features/social/community/models/community_model.dart';
 import 'package:math/features/social/community/services/community_service.dart';
-import 'package:math/widgets/message_banner.dart';
+import 'package:math/core/widgets/message_banner.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:animate_do/animate_do.dart';

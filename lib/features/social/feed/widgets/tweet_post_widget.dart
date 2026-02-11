@@ -5,29 +5,29 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:math/features/social/feed/models/post_model.dart';
-import 'package:math/router/app_router.dart';
-import 'package:math/screens/image_view_screen.dart';
-import 'package:math/services/auth_service.dart';
+import 'package:math/core/models/post_model.dart';
+import 'package:math/core/router/app_router.dart';
+import 'package:math/features/shared/presentation/screens/image_view_screen.dart';
+import 'package:math/core/services/auth_service.dart';
 import 'package:math/features/social/feed/services/social_service.dart';
-import 'package:math/widgets/poll_widget.dart';
+import 'package:math/core/widgets/poll_widget.dart';
 import 'package:math/features/social/feed/widgets/report_bottom_sheet.dart';
 import 'package:math/features/social/feed/widgets/post_options_bottom_sheet.dart';
 import 'package:math/features/social/feed/widgets/social_video_player.dart';
 
 import 'package:math/features/social/shared/widgets/user_profile_bottom_sheet.dart';
 import 'package:provider/provider.dart';
-import 'package:math/utils/avatar_color_generator.dart';
+import 'package:math/core/utils/avatar_color_generator.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:math/widgets/modern_dialogs.dart';
+import 'package:math/core/widgets/modern_dialogs.dart';
 import 'package:math/features/social/community/services/community_service.dart';
 import 'package:math/features/social/community/widgets/community_quick_join_bottom_sheet.dart';
-import 'package:math/widgets/linkable_text.dart';
-import 'package:math/screens/web_view_screen.dart';
+import 'package:math/core/widgets/linkable_text.dart';
+import 'package:math/features/shared/presentation/screens/web_view_screen.dart';
 import 'package:math/features/social/feed/services/cache_service.dart';
 import 'package:math/features/social/feed/services/download_service.dart';
-import 'package:math/widgets/download_progress_dialog.dart';
+import 'package:math/core/widgets/download_progress_dialog.dart';
 
 /// A Twitter-style post widget
 class TweetPostWidget extends StatefulWidget {
@@ -592,8 +592,9 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                                                           details,
                                                           currentUser.uid,
                                                         );
-                                                    if (!context.mounted)
+                                                    if (!context.mounted) {
                                                       return;
+                                                    }
                                                     ScaffoldMessenger.of(
                                                       context,
                                                     ).showSnackBar(
@@ -1093,8 +1094,9 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                                 (!isDirectRepost &&
                                     widget.post.originalPost != null);
 
-                            if (!hasExtraContent)
+                            if (!hasExtraContent) {
                               return const SizedBox.shrink();
+                            }
 
                             return GestureDetector(
                               onTap: () {

@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:math/features/social/feed/models/post_model.dart';
+import 'package:math/core/models/post_model.dart';
 import 'package:math/features/social/feed/widgets/tweet_post_widget.dart';
-import 'package:math/widgets/standard_bottom_sheet.dart';
+import 'package:math/core/widgets/standard_bottom_sheet.dart';
 
 class UserPostsBottomSheet extends StatelessWidget {
   final String userId;

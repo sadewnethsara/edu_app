@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:math/widgets/curriculum/curriculum_item_card.dart';
+import 'package:math/core/widgets/curriculum/curriculum_item_card.dart';
 
 void main() {
   Widget createWidgetUnderTest({

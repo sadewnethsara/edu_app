@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:math/services/logger_service.dart';
+import 'package:math/core/services/logger_service.dart';
 
 class DownloadService {
   static final DownloadService _instance = DownloadService._internal();

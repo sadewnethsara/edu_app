@@ -1,14 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:math/data/models/user_model.dart';
-import 'package:math/services/auth_service.dart';
+import 'package:math/core/models/user_model.dart';
+import 'package:math/core/services/auth_service.dart';
 import 'package:math/features/social/feed/services/social_service.dart';
 import 'package:math/features/social/shared/widgets/user_posts_bottom_sheet.dart';
 import 'package:math/features/social/shared/widgets/users_list_bottom_sheet.dart';
-import 'package:math/widgets/standard_bottom_sheet.dart';
+import 'package:math/core/widgets/standard_bottom_sheet.dart';
 import 'package:provider/provider.dart';
-import 'package:math/screens/edit_profile_screen.dart';
+import 'package:math/features/profile/presentation/screens/edit_profile_screen.dart';
 
 class UserProfileBottomSheet extends StatefulWidget {
   final String userId;

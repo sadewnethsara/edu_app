@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:math/data/models/user_model.dart';
-import 'package:math/features/social/feed/models/post_model.dart';
-import 'package:math/services/logger_service.dart';
+import 'package:math/core/models/user_model.dart';
+import 'package:math/core/models/post_model.dart';
+import 'package:math/core/services/logger_service.dart';
 
 class SocialService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

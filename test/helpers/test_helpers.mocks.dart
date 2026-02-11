@@ -14,7 +14,7 @@ import 'package:firebase_storage/firebase_storage.dart' as _i5;
 import 'package:firebase_storage_platform_interface/firebase_storage_platform_interface.dart'
     as _i6;
 import 'package:flutter/material.dart' as _i8;
-import 'package:math/services/auth_service.dart' as _i7;
+import 'package:math/core/services/auth_service.dart' as _i7;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i10;
 

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:math/data/models/post_model.dart';
+import 'package:math/core/models/post_model.dart';
 
 void main() {
   group('PostModel', () {

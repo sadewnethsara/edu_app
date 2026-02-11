@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:math/screens/curriculum/subjects_screen.dart';
-import 'package:math/services/language_service.dart';
+import 'package:math/features/lessons/presentation/curriculum/subjects_screen.dart';
+import 'package:math/core/services/language_service.dart';
 import 'package:provider/provider.dart';
 
 void main() {

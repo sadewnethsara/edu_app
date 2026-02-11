@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:math/widgets/unified_sliver_app_bar.dart';
+import 'package:math/core/widgets/unified_sliver_app_bar.dart';
 
 void main() {
   Widget createWidgetUnderTest({

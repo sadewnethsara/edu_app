@@ -7,8 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:math/features/social/community/models/community_resource_model.dart';
 import 'package:math/features/social/community/services/community_service.dart';
-import 'package:math/services/auth_service.dart';
-import 'package:math/widgets/message_banner.dart';
+import 'package:math/core/services/auth_service.dart';
+import 'package:math/core/widgets/message_banner.dart';
 import 'package:provider/provider.dart';
 
 class AddCommunityResourceScreen extends StatefulWidget {

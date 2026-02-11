@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:math/features/social/feed/models/post_model.dart';
-import 'package:math/widgets/standard_bottom_sheet.dart';
+import 'package:math/core/models/post_model.dart';
+import 'package:math/core/widgets/standard_bottom_sheet.dart';
 
 class RepostBottomSheet extends StatefulWidget {
   final PostModel post;

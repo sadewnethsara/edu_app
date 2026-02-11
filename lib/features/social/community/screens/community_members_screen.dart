@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:math/features/social/community/models/community_member_model.dart';
 import 'package:math/features/social/community/services/community_service.dart';
-import 'package:math/widgets/message_banner.dart';
+import 'package:math/core/widgets/message_banner.dart';
 
 class CommunityMembersScreen extends StatefulWidget {
   final String communityId;

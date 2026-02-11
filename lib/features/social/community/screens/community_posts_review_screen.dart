@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:math/features/social/community/services/community_service.dart';
-import 'package:math/features/social/feed/models/post_model.dart';
+import 'package:math/core/models/post_model.dart';
 import 'package:math/features/social/feed/widgets/tweet_post_widget.dart';
-import 'package:math/widgets/message_banner.dart';
-import 'package:math/services/auth_service.dart';
+import 'package:math/core/widgets/message_banner.dart';
+import 'package:math/core/services/auth_service.dart';
 import 'package:provider/provider.dart';
 
 class CommunityPostsReviewScreen extends StatefulWidget {
