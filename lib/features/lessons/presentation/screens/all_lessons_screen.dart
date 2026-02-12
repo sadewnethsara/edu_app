@@ -1,35 +1,16 @@
 import 'dart:ui'; // For BackdropFilter
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-// Firebase & State
+// Firebase & 3rd Party
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
-
-// Routing & Utils
-import 'package:go_router/go_router.dart';
-import 'package:logger/logger.dart';
-import 'package:math/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-// UI Packages
 import 'package:shimmer/shimmer.dart';
 import 'package:icons_plus/icons_plus.dart';
 
-// Data Models
-import 'package:math/core/models/content_model.dart';
-import 'package:math/core/models/grade_model.dart';
-import 'package:math/core/models/lesson_model.dart';
-import 'package:math/core/models/subject_model.dart';
-import 'package:math/core/models/subtopic_model.dart';
-
-// Services & Widgets
-import 'package:math/core/services/api_service.dart';
-import 'package:math/core/services/continue_learning_service.dart';
-import 'package:math/core/router/app_router.dart'; // For static route paths
-
-final logger = Logger();
+// App Exports
+import 'package:math/app_exports.dart';
+import 'package:math/l10n/app_localizations.dart';
 
 class AllLessonsScreen extends StatefulWidget {
   const AllLessonsScreen({super.key});

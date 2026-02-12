@@ -1,4 +1,4 @@
-import 'dart:ui'; // 🚀 For BackdropFilter
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,7 +21,6 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-// 🚀 Define login states
 enum LoginStep { identifier, password, otp }
 
 class _LoginScreenState extends State<LoginScreen> {

@@ -1,31 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:math/app_exports.dart';
 import 'package:math/l10n/app_localizations.dart';
-import 'package:math/core/router/app_router.dart';
-import 'package:math/core/services/auth_service.dart';
-import 'package:math/core/services/language_service.dart';
-import 'package:math/core/services/streak_service.dart';
-import 'package:math/core/services/theme_service.dart';
-import 'package:math/core/theme/app_theme.dart';
-import 'package:provider/provider.dart';
-
-import 'package:math/core/services/network_service.dart';
-import 'package:math/core/widgets/offline_banner.dart';
-import 'package:math/core/services/app_usage_service.dart';
-import 'package:math/core/services/continue_learning_service.dart';
-import 'package:math/core/services/zen_mode_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:math/firebase_options.dart';
 import 'package:math/features/social/feed/services/cache_service.dart';
-import 'package:math/core/services/settings_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
 
-  // Add global error handler to catch WebView errors
   FlutterError.onError = (FlutterErrorDetails details) {
     if (details.exception is PlatformException) {
       final exception = details.exception as PlatformException;
@@ -40,15 +26,13 @@ void main() async {
     FlutterError.presentError(details);
   };
 
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // INITIALIZE APP CHECK
   await FirebaseAppCheck.instance.activate(
     providerAndroid: AndroidDebugProvider(),
     providerApple: AppleAppAttestProvider(),
   );
 
-  // Enable edge-to-edge display
   SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.edgeToEdge,
     overlays: [SystemUiOverlay.top],
@@ -61,8 +45,6 @@ void main() async {
 
   await CacheService().init();
   await CacheService().clearOldCache();
-
-  await SettingsService().init();
 
   runApp(const MyApp());
 }
@@ -106,7 +88,7 @@ class _MyAppState extends State<MyApp> {
               previousStreak!..updateAuth(auth),
         ),
         ChangeNotifierProvider(create: (context) => ZenModeService()),
-        ChangeNotifierProvider.value(value: SettingsService()),
+        ChangeNotifierProvider(create: (context) => SettingsService()..init()),
       ],
       child: Consumer2<ThemeService, LanguageService>(
         builder: (context, themeService, languageService, child) {
@@ -141,7 +123,7 @@ class _MyAppState extends State<MyApp> {
                     builder: (context, networkService, _) {
                       return Stack(
                         children: [
-                          mainApp, // This is our main app
+                          mainApp,
                           OfflineBanner(
                             isOnline:
                                 networkService.status == NetworkStatus.online,

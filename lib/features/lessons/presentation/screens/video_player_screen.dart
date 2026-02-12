@@ -1,17 +1,9 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:logger/logger.dart';
-import 'package:math/core/models/content_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:provider/provider.dart';
-import 'package:math/core/services/auth_service.dart';
-import 'package:math/core/services/continue_learning_service.dart';
-import 'package:flutter/services.dart';
-
-final logger = Logger();
+import 'package:math/app_exports.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final List<ContentItem> playlist;

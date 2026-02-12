@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -49,22 +50,21 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCtTm0Uu9WT5U1Sg-l6DiDeuuhEwlEXwmk',
-    appId: '1:1099003660019:android:a6389fbc0a769be1839986',
-    messagingSenderId: '1099003660019',
-    projectId: 'math-world-01',
-    storageBucket: 'math-world-01.firebasestorage.app',
-  );
+  static FirebaseOptions get android => FirebaseOptions(
+        apiKey: dotenv.get('FIREBASE_ANDROID_API_KEY'),
+        appId: dotenv.get('FIREBASE_ANDROID_APP_ID'),
+        messagingSenderId: dotenv.get('FIREBASE_MESSAGING_SENDER_ID'),
+        projectId: dotenv.get('FIREBASE_PROJECT_ID'),
+        storageBucket: dotenv.get('FIREBASE_STORAGE_BUCKET'),
+      );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAbbXMbuORgmq7dN5s6b_BSyhjRzGfFf64',
-    appId: '1:1099003660019:ios:91b23ed1c03b4950839986',
-    messagingSenderId: '1099003660019',
-    projectId: 'math-world-01',
-    storageBucket: 'math-world-01.firebasestorage.app',
-    iosClientId:
-        '1099003660019-4u2vgsp4ai23mdtju5b10u3ao3mppnqs.apps.googleusercontent.com',
-    iosBundleId: 'com.nethsara.math',
-  );
+  static FirebaseOptions get ios => FirebaseOptions(
+        apiKey: dotenv.get('FIREBASE_IOS_API_KEY'),
+        appId: dotenv.get('FIREBASE_IOS_APP_ID'),
+        messagingSenderId: dotenv.get('FIREBASE_MESSAGING_SENDER_ID'),
+        projectId: dotenv.get('FIREBASE_PROJECT_ID'),
+        storageBucket: dotenv.get('FIREBASE_STORAGE_BUCKET'),
+        iosClientId: dotenv.get('FIREBASE_IOS_CLIENT_ID'),
+        iosBundleId: dotenv.get('FIREBASE_IOS_BUNDLE_ID'),
+      );
 }
