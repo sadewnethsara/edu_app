@@ -1,4 +1,3 @@
-// LESSONS FEATURE EXPORTS
 export 'presentation/screens/all_lessons_screen.dart';
 export 'presentation/screens/lesson_search_screen.dart';
 export 'presentation/screens/note_viewer_screen.dart';

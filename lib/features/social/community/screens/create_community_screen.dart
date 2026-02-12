@@ -76,7 +76,6 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
   Future<void> _createCommunity() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // Validate rules (remove empty ones)
     final rules = _rulesControllers
         .map((c) => c.text.trim())
         .where((t) => t.isNotEmpty)
@@ -107,7 +106,6 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
             message: 'Community created successfully!',
             type: MessageType.success,
           );
-          // Navigate to the new community or back
           context.pop(true);
         }
       } else {
@@ -160,11 +158,9 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- Images Section ---
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Icon Picker
                   GestureDetector(
                     onTap: () => _pickImage(isIcon: true),
                     child: Container(
@@ -187,7 +183,6 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
                     ),
                   ),
                   SizedBox(width: 16.w),
-                  // Banner Picker
                   Expanded(
                     child: GestureDetector(
                       onTap: () => _pickImage(isIcon: false),
@@ -229,7 +224,6 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
               ),
               SizedBox(height: 24.h),
 
-              // --- Basic Info ---
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
@@ -271,7 +265,6 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
               ),
               SizedBox(height: 24.h),
 
-              // --- Privacy ---
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('Private Community'),
@@ -282,7 +275,6 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
               const Divider(),
               SizedBox(height: 16.h),
 
-              // --- Rules ---
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

@@ -70,7 +70,6 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
 
     final results = await _apiService.searchUsers(query);
 
-    // Filter out current user
     final myUid = context.read<AuthService>().user?.uid;
     final filtered = results.where((u) => u.uid != myUid).toList();
 
@@ -96,7 +95,6 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
 
     final isFollowing = _followingIds.contains(user.uid);
 
-    // Optimistic Update
     setState(() {
       if (isFollowing) {
         _followingIds.remove(user.uid);
@@ -112,7 +110,6 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
         await _apiService.followUser(myUid, user.uid);
       }
     } catch (e) {
-      // Revert if failed
       if (mounted) {
         setState(() {
           if (isFollowing) {
@@ -167,7 +164,6 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
       ),
       body: Stack(
         children: [
-          // Background Gradient (Subtle)
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -186,7 +182,6 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
             child: Column(
               children: [
                 SizedBox(height: 10.h),
-                // Search Bar
                 Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: 16.w,
@@ -251,7 +246,6 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
                   ),
                 ),
 
-                // Results
                 Expanded(
                   child:
                       _searchResults.isEmpty &&
@@ -346,7 +340,6 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
       ),
       child: Row(
         children: [
-          // Avatar
           Container(
             width: 56.w,
             height: 56.w,
@@ -394,7 +387,6 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
             ),
           ),
           SizedBox(width: 16.w),
-          // Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,7 +438,6 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
               ],
             ),
           ),
-          // Action Button
           SizedBox(width: 8.w),
           GestureDetector(
             onTap: () => _toggleFollow(user),

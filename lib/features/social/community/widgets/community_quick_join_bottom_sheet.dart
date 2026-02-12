@@ -181,8 +181,6 @@ class _CommunityQuickJoinBottomSheetState
                   ? (widget.alreadyJoined
                         ? () {
                             Navigator.pop(context);
-                            // Maybe open community details? For now just close or do nothing special.
-                            // User can tap header in post detail to go to community.
                           }
                         : null)
                   : _joinCommunity,

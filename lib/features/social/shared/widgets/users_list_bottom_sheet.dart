@@ -124,7 +124,6 @@ class _UsersListBottomSheetState extends State<UsersListBottomSheet> {
               ),
               onTap: () {
                 Navigator.pop(context);
-                // Navigate to user profile (recursive but handled by GoRouter/Navigator)
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,

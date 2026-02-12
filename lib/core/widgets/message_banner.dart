@@ -21,7 +21,6 @@ class MessageBanner extends StatefulWidget {
   @override
   State<MessageBanner> createState() => _MessageBannerState();
 
-  // Static method to show banner
   static void show(
     BuildContext context, {
     required String message,
@@ -47,7 +46,6 @@ class MessageBanner extends StatefulWidget {
 
     overlay.insert(overlayEntry);
 
-    // Auto-remove after duration
     Timer(duration, () {
       if (overlayEntry.mounted) {
         overlayEntry.remove();
@@ -82,7 +80,6 @@ class _MessageBannerState extends State<MessageBanner>
 
     _controller.forward();
 
-    // Auto-dismiss
     Timer(widget.duration - const Duration(milliseconds: 400), () {
       if (mounted) {
         _controller.reverse().then((_) {

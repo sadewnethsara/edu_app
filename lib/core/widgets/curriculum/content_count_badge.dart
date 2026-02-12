@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// Badge showing content type count (videos, notes, pdfs, resources)
 class ContentCountBadge extends StatelessWidget {
   final IconData icon;
   final int count;

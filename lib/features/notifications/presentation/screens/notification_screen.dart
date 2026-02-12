@@ -56,12 +56,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
   void _onNotificationTapped(NotificationModel notification) {
     if (_currentUserId == null) return;
 
-    // 1. Mark as read (runs in background)
     if (!notification.isRead) {
       _apiService.markNotificationAsRead(_currentUserId!, notification.id);
     }
 
-    // 2. Navigate based on type
     switch (notification.type) {
       case NotificationType.newFollower:
         if (notification.senderId != null) {
@@ -118,7 +116,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
       case NotificationType.system:
       case NotificationType.grade:
       case NotificationType.unknown:
-        // No navigation
         break;
     }
   }
@@ -181,7 +178,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ),
               ),
 
-              // Content
               if (_isLoading)
                 _buildShimmerList(theme)
               else if (_notifications.isEmpty)
@@ -346,7 +342,6 @@ class _NotificationTile extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon
             Stack(
               children: [
                 CircleAvatar(
@@ -384,7 +379,6 @@ class _NotificationTile extends StatelessWidget {
             ),
             SizedBox(width: 16.w),
 
-            // Text Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -420,7 +414,6 @@ class _NotificationTile extends StatelessWidget {
             ),
             SizedBox(width: 12.w),
 
-            // Read Indicator
             if (!notification.isRead)
               Container(
                 width: 10.r,

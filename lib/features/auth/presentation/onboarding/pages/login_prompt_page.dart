@@ -3,14 +3,12 @@ import 'dart:ui';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoginPromptPage extends StatelessWidget {
-  // Callback to tell the parent to navigate to the login screen
   final VoidCallback onLoginPrompt;
 
   const LoginPromptPage({super.key, required this.onLoginPrompt});
 
   @override
   Widget build(BuildContext context) {
-    // Get theme properties
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;

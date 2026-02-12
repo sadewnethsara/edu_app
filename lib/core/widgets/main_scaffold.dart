@@ -65,7 +65,6 @@ class _MainScaffoldState extends State<MainScaffold>
         extendBody: true, // Allow content to flow behind navbar
         body: widget.navigationShell,
 
-        // Animated FAB - Only visible on Feed (Index 2)
         floatingActionButton: widget.navigationShell.currentIndex == 2
             ? ScaleTransition(
                 scale: _animation,
@@ -73,7 +72,6 @@ class _MainScaffoldState extends State<MainScaffold>
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // --- Communities List Button (Small) ---
                     SizedBox(
                       height: 42.w,
                       width: 42.w,
@@ -94,7 +92,6 @@ class _MainScaffoldState extends State<MainScaffold>
                       ),
                     ),
                     SizedBox(height: 6.h),
-                    // --- Create Post Button ---
                     FloatingActionButton(
                       heroTag: 'createPostFAB',
                       onPressed: () => context.push(AppRouter.createPostPath),
@@ -118,9 +115,6 @@ class _MainScaffoldState extends State<MainScaffold>
             : null,
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
-        // Using Stack/Positioned or custom BottomAppBar approach
-        // Since ProfessionalNavBar renders its own container, we can wrap it.
-        // We use SizeTransition or SlideTransition.
         bottomNavigationBar: SizeTransition(
           sizeFactor: _animation,
           axisAlignment: -1.0,
@@ -136,8 +130,6 @@ class _MainScaffoldState extends State<MainScaffold>
   void _onTap(BuildContext context, int index) {
     widget.navigationShell.goBranch(
       index,
-      // A common pattern when switching branches, for example to reset the
-      // stack to the initial route when tapping the item that is already selected.
       initialLocation: index == widget.navigationShell.currentIndex,
     );
   }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:math/core/models/content_model.dart';
 
-/// Card for content items (videos, notes, pdfs, resources)
 class ContentItemCard extends StatelessWidget {
   final ContentItem item;
   final IconData icon;
@@ -68,7 +67,6 @@ class ContentItemCard extends StatelessWidget {
             padding: EdgeInsets.all(12.w),
             child: Row(
               children: [
-                // Thumbnail / Icon Box
                 Stack(
                   alignment: Alignment.center,
                   children: [
@@ -111,14 +109,12 @@ class ContentItemCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(width: 16.w),
-                // Text Info
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          // Type Badge
                           Container(
                             padding: EdgeInsets.symmetric(
                               horizontal: 6.w,

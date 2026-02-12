@@ -450,7 +450,6 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
         SizedBox(height: 12.h),
         Row(
           children: [
-            // Profile Image
             GestureDetector(
               onTap: () => _pickImage(false),
               child: Stack(
@@ -506,7 +505,6 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
               ),
             ),
             SizedBox(width: 16.w),
-            // Banner Image
             Expanded(
               child: GestureDetector(
                 onTap: () => _pickImage(true),

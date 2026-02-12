@@ -20,18 +20,15 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  // Player Controllers
   VideoPlayerController? _videoPlayerController;
   ChewieController? _chewieController;
   YoutubePlayerController? _youtubePlayerController;
 
-  // State Management
   late int _currentIndex;
   late ContentItem _currentItem;
   bool _isLoading = true;
   bool _isYoutubeVideo = false;
 
-  // Resume Playback State
   Duration _lastPosition = Duration.zero;
 
   @override
@@ -41,11 +38,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     _currentItem = widget.playlist[_currentIndex];
     _loadLastPositionAndInitialize();
 
-    // Hide Status Bar and Navigation Bar
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
 
-  // --- Resume Playback Logic ---
   Future<void> _loadLastPositionAndInitialize() async {
     final prefs = await SharedPreferences.getInstance();
     final savedId = prefs.getString('last_video_id');
@@ -120,7 +115,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       logger.e('Failed to save last position', error: e);
     }
   }
-  // --- End Resume Logic ---
 
   Future<void> _initializePlayer(
     String url, {
@@ -132,7 +126,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
     await _saveLastPosition();
 
-    // Dispose old controllers
     await _videoPlayerController?.dispose();
     _chewieController?.dispose();
     _youtubePlayerController?.dispose();
@@ -145,7 +138,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       final youtubeId = YoutubePlayer.convertUrlToId(url);
 
       if (youtubeId != null) {
-        // It's a YouTube video
         logger.i('Loading YouTube video with ID: $youtubeId');
         setState(() => _isYoutubeVideo = true);
 
@@ -160,7 +152,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           ),
         );
       } else {
-        // It's a regular video URL
         logger.i('Loading regular video from URL: $url');
         setState(() => _isYoutubeVideo = false);
 
@@ -221,7 +212,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   void dispose() {
-    // Restore System UI
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _saveLastPosition();
     _videoPlayerController?.dispose();
@@ -250,22 +240,18 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   void _markAsCompleted() {
-    // 1. Award points
     Provider.of<AuthService>(context, listen: false).awardPoints(10);
 
-    // 2. Mark as complete in Firestore
     Provider.of<AuthService>(
       context,
       listen: false,
     ).markContentAsCompleted(_currentItem.id);
 
-    // 3. Clear the "Continue Learning" bookmark
     Provider.of<ContinueLearningService>(
       context,
       listen: false,
     ).clearLastViewedItem();
 
-    // 4. Show success message
     logger.i('Marked as completed: ${_currentItem.name}');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -289,7 +275,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Video Player
           AspectRatio(
             aspectRatio: 16 / 9,
             child: Container(
@@ -314,10 +299,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             ),
           ),
 
-          // 2. Description Section
           _buildDescriptionSection(theme),
 
-          // 3. "Up Next" Title
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             child: Text(
@@ -330,7 +313,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             ),
           ),
 
-          // 4. Playlist
           Expanded(child: _buildPlaylist()),
         ],
       ),
@@ -396,7 +378,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         final item = widget.playlist[index];
         final bool isPlaying = (index == _currentIndex);
 
-        // Get thumbnail URL
         String? thumbnailUrl = item.thumbnail;
         if (thumbnailUrl == null || thumbnailUrl.isEmpty) {
           final youtubeId = YoutubePlayer.convertUrlToId(item.url);

@@ -18,8 +18,6 @@ import 'package:intl/intl.dart';
 import 'package:math/features/profile/presentation/screens/edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  // 🚀 Can be null. If null, shows current user's profile.
-  // If provided, shows that user's public profile.
   final String? userId;
 
   const ProfileScreen({super.key, this.userId});
@@ -37,13 +35,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, int> _userAchievements = {};
   String _joinDate = '';
 
-  // 🚀 --- NEW STATE FOR SOCIAL --- 🚀
   late String _profileUserId; // The ID of the profile being viewed
   late String _currentUserId; // The ID of the person using the app
   bool _isCurrentUserProfile = false;
   bool _isFollowing = false;
   bool _isFollowLoading = false; // For the follow button
-  // 🚀 --- END OF NEW STATE --- 🚀
 
   @override
   void initState() {
@@ -68,7 +64,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _profileUserId = widget.userId ?? _currentUserId;
       _isCurrentUserProfile = (_profileUserId == _currentUserId);
 
-      // 1. Get User's full document
       final userDoc = await _firestore
           .collection('users')
           .doc(_profileUserId)
@@ -81,20 +76,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final userData = userDoc.data()!;
       _userModel = UserModel.fromJson(userData);
 
-      // 2. Save profile data
       _userAchievements = _userModel!.achievements;
       _joinDate = _userModel!.createdAt != null
           ? DateFormat('MMMM yyyy').format(_userModel!.createdAt!.toDate())
           : 'Unknown';
 
-      // 3. Fetch data in parallel
       final results = await Future.wait([
         _apiService.getUserRank(_userModel!.points),
-        // 🚀 NEW: Check if the current user is following this profile
         _checkIfFollowing(),
       ]);
 
-      // Store results
       _isFollowing = results[1] as bool;
     } catch (e) {
       logger.e('Error loading profile', error: e);
@@ -103,7 +94,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // 🚀 --- NEW: CHECK FOLLOW STATUS --- 🚀
   Future<bool> _checkIfFollowing() async {
     if (_isCurrentUserProfile) return false; // Can't follow self
 
@@ -120,20 +110,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // 🚀 --- NEW: FOLLOW/UNFOLLOW LOGIC --- 🚀
   Future<void> _toggleFollow() async {
     setState(() => _isFollowLoading = true);
     final authService = context.read<AuthService>();
 
     String? error;
     if (_isFollowing) {
-      // --- Unfollow ---
       error = await authService.unfollowUser(_profileUserId);
       if (error == null) {
         setState(() => _isFollowing = false);
       }
     } else {
-      // --- Follow ---
       error = await authService.followUser(_profileUserId);
       if (error == null) {
         setState(() => _isFollowing = true);
@@ -187,15 +174,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- Profile Info (Instagram Style) ---
                   _buildProfileHeaderInfo(theme, user),
                   SizedBox(height: 24.h),
 
-                  // --- Stats Section ---
                   _buildStatsSection(theme, streakService, user),
                   SizedBox(height: 24.h),
 
-                  // --- Achievements Section ---
                   _buildSectionHeader(
                     theme,
                     'Achievements',
@@ -206,11 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _buildAchievementsList(theme),
                   SizedBox(height: 24.h),
 
-                  // --- 🚀 ONLY SHOW PRIVATE INFO FOR CURRENT USER --- 🚀
-                  // Removed 'My Grades' and 'My Personal Info' as requested to be moved/consolidated
-                  if (_isCurrentUserProfile) ...[
-                    // Any other private info can go here
-                  ],
+                  if (_isCurrentUserProfile) ...[],
                 ],
               ),
             ),
@@ -283,7 +263,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // 🚀 --- UPDATED STATS SECTION --- 🚀
   Widget _buildStatsSection(
     ThemeData theme,
     StreakService streakService,
@@ -296,7 +275,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             icon: EvaIcons
                 .smiling_face_outline, // Use generic 'reward' or similar
             label: 'Streak',
-            // Show streak only for current user
             value: _isCurrentUserProfile
                 ? '${streakService.currentStreak} 🔥'
                 : '-',
@@ -306,7 +284,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         SizedBox(width: 12.w),
 
-        // --- TAPPABLE "FOLLOWING" CARD ---
         Expanded(
           child: GestureDetector(
             onTap: () {
@@ -331,7 +308,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         SizedBox(width: 12.w),
 
-        // --- TAPPABLE "FOLLOWERS" CARD ---
         Expanded(
           child: GestureDetector(
             onTap: () {
@@ -357,7 +333,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ],
     );
   }
-  // 🚀 --- END OF UPDATED STATS --- 🚀
 
   Widget _buildSectionHeader(ThemeData theme, String title, IconData icon) {
     return Row(
@@ -427,12 +402,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Modern Centered Profile Header
   Widget _buildProfileHeaderInfo(ThemeData theme, UserModel user) {
     return Column(
       children: [
         SizedBox(height: 10.h),
-        // Avatar with Glow
         Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -465,7 +438,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         SizedBox(height: 16.h),
 
-        // Name & Bio
         Text(
           user.displayName,
           style: theme.textTheme.headlineSmall?.copyWith(
@@ -483,7 +455,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         SizedBox(height: 24.h),
 
-        // Action Buttons (Centered Row)
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 40.w),
           child: Row(
@@ -515,9 +486,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(width: 12.w),
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () {
-                      // Share profile logic
-                    },
+                    onPressed: () {},
                     style: OutlinedButton.styleFrom(
                       foregroundColor: theme.primaryColor,
                       side: BorderSide(color: theme.primaryColor),
@@ -557,9 +526,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(width: 12.w),
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () {
-                      // Message logic
-                    },
+                    onPressed: () {},
                     style: OutlinedButton.styleFrom(
                       foregroundColor: theme.primaryColor,
                       side: BorderSide(color: theme.primaryColor),
@@ -577,7 +544,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         SizedBox(height: 24.h),
 
-        // Quick Stats Row (Points, Followers, Following)
         Container(
           padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 20.w),
           decoration: BoxDecoration(
@@ -739,7 +705,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       progressText = "Max Level!";
     }
 
-    // Clamp progress
     progress = progress.clamp(0.0, 1.0);
 
     return Container(
@@ -763,7 +728,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Row(
         children: [
-          // Icon Badge with Glow
           Container(
             width: 56.r,
             height: 56.r,
@@ -786,7 +750,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           SizedBox(width: 16.w),
 
-          // Content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -820,7 +783,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 SizedBox(height: 12.h),
 
-                // Premium Progress Bar
                 Stack(
                   children: [
                     Container(
@@ -864,8 +826,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-
-// --- Reusable Local Widgets ---
 
 class _StatCard extends StatelessWidget {
   final IconData icon;

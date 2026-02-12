@@ -1,4 +1,3 @@
-// ⚙️ SETTINGS FEATURE EXPORTS
 export 'presentation/screens/settings_screen.dart';
 export 'presentation/screens/language_selection_screen.dart';
 export 'presentation/screens/clear_cache_screen.dart';

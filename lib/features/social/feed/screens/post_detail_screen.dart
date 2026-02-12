@@ -61,7 +61,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
   ReplyModel? _replyingTo;
   final FocusNode _replyFocusNode = FocusNode();
 
-  // Filtering
   final ValueNotifier<String> _sortBy = ValueNotifier<String>(
     'newest',
   ); // newest, top, helpful
@@ -109,7 +108,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
           .doc(widget.postId)
           .collection('replies');
 
-      // Sort by chosen filter
       Query finalQuery;
       if (_sortBy.value == 'top') {
         finalQuery = query.orderBy('likeCount', descending: true);
@@ -125,7 +123,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
           .map((doc) => ReplyModel.fromSnapshot(doc))
           .toList();
 
-      // Threaded Tree Structure Logic
       final Map<String, List<ReplyModel>> childrenMap = {};
       final List<ReplyModel> roots = [];
 
@@ -141,7 +138,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
       void addRecursive(ReplyModel node) {
         sorted.add(node);
         final children = childrenMap[node.replyId] ?? [];
-        // Optionally sort children by the same criteria if they don't follow global sort
         for (var child in children) {
           addRecursive(child);
         }
@@ -194,7 +190,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
 
     try {
       String? imageUrl;
-      // 🚀 Upload Image if selected
       if (_selectedReplyAssets.isNotEmpty) {
         final file = await _selectedReplyAssets.first.file;
         if (file != null) {
@@ -224,15 +219,11 @@ class _PostDetailScreenState extends State<PostDetailScreen>
 
       await replyDoc.set(newReply.toJson());
 
-      // Increment reply count safely using a transaction or batch if preferred,
-      // but simple update is fine for MVP.
       await _firestore.collection('posts').doc(widget.postId).update({
         'replyCount': FieldValue.increment(1),
       });
 
-      // --- Send Notification ---
       if (_replyingTo != null) {
-        // Notify Parent Comment Author
         await SocialService().sendNotification(
           toUserId: _replyingTo!.authorId,
           title: 'New Reply',
@@ -244,7 +235,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
           targetContentId: widget.postId,
         );
       } else if (_post != null) {
-        // Notify Post Author
         await SocialService().sendNotification(
           toUserId: _post!.authorId,
           title: 'New Comment',
@@ -264,7 +254,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
         _selectedReplyAssets.clear(); // 🚀 Clear image
       });
       await _loadReplies();
-      // Also reload post to update reply count in UI
       await _loadPost();
     } catch (e) {
       logger.e('Failed to publish reply', error: e);
@@ -287,7 +276,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
     FocusScope.of(context).requestFocus(_replyFocusNode);
   }
 
-  // 🚀 Pick Image Method
   Future<void> _pickReplyImage() async {
     final theme = Theme.of(context);
     final pickerTheme = InstaAssetPicker.themeData(theme.primaryColor).copyWith(
@@ -644,7 +632,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
     );
   }
 
-  // Shimmer effect for post loading
   Widget _buildPostShimmer(ThemeData theme) {
     final isDark = theme.brightness == Brightness.dark;
     return Shimmer.fromColors(
@@ -655,7 +642,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header shimmer
             Row(
               children: [
                 CircleAvatar(radius: 22.r, backgroundColor: Colors.white),
@@ -687,7 +673,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
               ],
             ),
             SizedBox(height: 16.h),
-            // Text content shimmer
             Container(
               height: 20.h,
               width: double.infinity,
@@ -715,7 +700,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
               ),
             ),
             SizedBox(height: 16.h),
-            // Image placeholder shimmer (optional)
             Container(
               height: 220.h,
               width: double.infinity,
@@ -732,7 +716,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
               ),
             ),
             SizedBox(height: 16.h),
-            // Timestamp shimmer
             Container(
               height: 14.h,
               width: 150.w,
@@ -742,7 +725,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
               ),
             ),
             SizedBox(height: 24.h),
-            // Action buttons shimmer
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(
@@ -757,7 +739,6 @@ class _PostDetailScreenState extends State<PostDetailScreen>
     );
   }
 
-  // Shimmer effect for replies loading
   Widget _buildRepliesShimmer(ThemeData theme) {
     final isDark = theme.brightness == Brightness.dark;
     return Shimmer.fromColors(
@@ -864,7 +845,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
       final List<String> localPaths = List<String>.from(localPathsDynamic);
       final post = _effectivePost;
 
-      // Reconstruct original URLs order to map them
       final mediaUrls = [...post.imageUrls];
       if (post.imageUrl != null) mediaUrls.add(post.imageUrl!);
       if (post.videoUrl != null) mediaUrls.add(post.videoUrl!);
@@ -901,7 +881,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
       _initStats();
     }
 
-    // Re-check join status if post changes
     if (oldWidget.post.postId != widget.post.postId) {
       _checkIfJoined();
     }
@@ -951,7 +930,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
   }
 
   Future<void> _handleShare() async {
-    // 1. Increment Share Count
     await SocialService().incrementShareCount(_effectivePost.postId);
     if (mounted) {
       setState(() {
@@ -959,7 +937,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
       });
     }
 
-    // 2. Open Share Sheet
     final url = 'https://yourapp.com/post/${_effectivePost.postId}';
     await SharePlus.instance.share(
       ShareParams(
@@ -977,10 +954,8 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
   }
 
   Future<void> _handleShareSheet() async {
-    // 1. Increment Share Count
     await SocialService().incrementShareCount(_effectivePost.postId);
 
-    // 2. Open Share Sheet
     final url = 'https://yourapp.com/post/${_effectivePost.postId}';
 
     await SharePlus.instance.share(
@@ -995,13 +970,11 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
       context,
       onDelete: () async {
         try {
-          // Store navigator before async gap
           final navigator = Navigator.of(context);
 
           await SocialService().deletePost(widget.post.postId);
 
           if (mounted) {
-            // Pop back to feed
             navigator.pop();
             ScaffoldMessenger.of(
               context,
@@ -1177,9 +1150,7 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
           _isFavorited = isFavoritedFound;
         });
       }
-    } catch (_) {
-      // Fail silently for background checks
-    }
+    } catch (_) {}
   }
 
   Future<void> _toggleFavorite() async {
@@ -1278,7 +1249,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
     final hasVideo = post.videoUrl != null && post.videoUrl!.isNotEmpty;
     const double phi = 1.61803398875; // 🚀 Golden Ratio
 
-    // Standardize to list
     final mediaUrls = urls.isNotEmpty
         ? urls
         : (post.imageUrl != null ? [post.imageUrl!] : <String>[]);
@@ -1388,7 +1358,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
               height: goldenHeight,
               child: Builder(
                 builder: (context) {
-                  // Case 1: Video + 1 Image or just 2 Images
                   if (hasVideo && mediaUrls.length == 1) {
                     return Row(
                       children: [
@@ -1409,7 +1378,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
                     );
                   }
 
-                  // Case 2: Video + 2 Images or just 3 Images
                   if (hasVideo && mediaUrls.length == 2) {
                     return Row(
                       children: [
@@ -1446,12 +1414,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
                     );
                   }
 
-                  // Default fallback for other cases (e.g. 4+ images) - simplifying for now or handling as per original logic if it had one.
-                  // Original code ended at 3 images logic. I'll maintain that.
-                  // Check if there are more complex cases?
-                  // The viewing window showed up to Case 2. I'll assume that's the extent or return a generic Grid/List if needed.
-                  // For safety, if none match, return first image or something safe.
-
                   return SizedBox(
                     height: goldenHeight,
                     child: !hasVideo && mediaUrls.isNotEmpty
@@ -1487,9 +1449,7 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
           _isJoined = isMember;
         });
       }
-    } catch (_) {
-      // Fail silently
-    }
+    } catch (_) {}
   }
 
   @override
@@ -1503,13 +1463,11 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- Community Header (If Applicable) ---
           _buildCommunityHeader(context, theme, post),
           if (post.communityName != null ||
               post.originalPost?.communityName != null)
             SizedBox(height: 4.h),
 
-          // --- Header (User Info) ---
           Row(
             children: [
               CircleAvatar(
@@ -1547,7 +1505,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
                 ),
               ),
 
-              /// RIGHT SIDE (Options + Join)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -1631,7 +1588,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
           ),
           SizedBox(height: 16.h),
 
-          // --- Post Content ---
           if (post.text.isNotEmpty)
             LinkableText(
               text: post.text,
@@ -1644,7 +1600,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
               ),
             ),
 
-          // 🚀 Subject & Category Badges
           if (post.subjectName != null ||
               post.tags.isNotEmpty ||
               post.category != PostCategory.general)
@@ -1761,7 +1716,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
               ),
             ),
 
-          // 🚀 Formal Link Attachment
           if (post.linkUrl != null)
             Padding(
               padding: EdgeInsets.only(top: 16.h),
@@ -1812,17 +1766,14 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
               ),
             ),
 
-          // --- Media Section (Images & Video) ---
           _buildPostMedia(context, post),
 
-          // --- Poll ---
           if (post.pollData != null)
             Padding(
               padding: EdgeInsets.only(top: 16.h),
               child: PollWidget(postId: post.postId, pollData: post.pollData!),
             ),
 
-          // --- Quoted Post Preview ---
           if (post.originalPost != null)
             Padding(
               padding: EdgeInsets.only(top: 16.h),
@@ -1835,7 +1786,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
 
           SizedBox(height: 16.h),
 
-          // --- Timestamp ---
           Text(
             _formatTimestamp(post.createdAt),
             style: theme.textTheme.bodyMedium?.copyWith(
@@ -1868,7 +1818,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
 
           Divider(height: 24.h, thickness: 0.5),
 
-          // --- Stats (Reposts, Likes, Shares) ---
           if (_likeCount > 0 ||
               post.replyCount > 0 ||
               _reShareCount > 0 ||
@@ -1889,7 +1838,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
             Divider(height: 1, thickness: 0.5, color: theme.dividerColor),
           ],
 
-          // --- Action Bar ---
           Padding(
             padding: EdgeInsets.symmetric(vertical: 4.h),
             child: Row(
@@ -1899,7 +1847,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
                   icon: Iconsax.messages_2_outline,
                   color: Colors.grey.shade600,
                   onTap: () {
-                    // Logic to focus reply field
                     widget.replyFocusNode.requestFocus();
                   },
                 ),
@@ -2009,12 +1956,10 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
         ),
         const Spacer(),
 
-        // Join Button
         Builder(
           builder: (context) {
             final user = context.read<AuthService>().user;
 
-            // If not logged in, show join button
             if (user == null) {
               return _buildJoinButton(
                 context: context,
@@ -2076,7 +2021,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
 
                   if (!context.mounted) return;
 
-                  // Update state immediately
                   setState(() {
                     _isJoined = true;
                   });
@@ -2156,7 +2100,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: Author & Community
             Row(
               children: [
                 SizedBox(
@@ -2164,7 +2107,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
                   height: 32.r,
                   child: Stack(
                     children: [
-                      // User Photo
                       Align(
                         alignment: post.communityId != null
                             ? Alignment.bottomRight
@@ -2190,7 +2132,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
                               : null,
                         ),
                       ),
-                      // Community Icon
                       if (post.communityId != null)
                         Positioned(
                           top: 0,
@@ -2240,7 +2181,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                // 🚀 Header Join Button
                 if (post.communityId != null)
                   Builder(
                     builder: (context) {
@@ -2280,7 +2220,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
               ],
             ),
 
-            // 🚀 Category, Subject, Tags Row
             if (post.subjectId != null ||
                 post.category != PostCategory.general ||
                 post.tags.isNotEmpty)
@@ -2370,7 +2309,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
                 ),
               ),
 
-            // 🚀 Helpful Answer Indicator
             if (post.helpfulAnswerCount > 0)
               Padding(
                 padding: EdgeInsets.only(top: 8.h),
@@ -2401,7 +2339,6 @@ class _MainPostWidgetState extends State<_MainPostWidget> {
                 ),
               ),
 
-            // Quoted Media Preview
             if (post.imageUrls.isNotEmpty ||
                 post.imageUrl != null ||
                 post.videoUrl != null)
@@ -2795,7 +2732,6 @@ class _ReplyWidgetState extends State<_ReplyWidget> {
                   style: theme.textTheme.bodyMedium,
                 ),
 
-                // Multi-Image Display
                 if (reply.imageUrls.isNotEmpty)
                   Padding(
                     padding: EdgeInsets.only(top: 8.h),
@@ -2835,7 +2771,6 @@ class _ReplyWidgetState extends State<_ReplyWidget> {
                     ),
                   ),
 
-                // Video Display
                 if (reply.videoUrl != null)
                   Padding(
                     padding: EdgeInsets.only(top: 8.h),

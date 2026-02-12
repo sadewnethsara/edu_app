@@ -29,7 +29,6 @@ class _FeedScreenState extends State<FeedScreen> {
   bool _isLoading = true;
   List<PostModel> _posts = [];
 
-  // 🚀 Feed Filter State
   String _feedFilter = 'all'; // 'all', 'following', 'trending', 'subject'
   String? _selectedSubjectId;
   String? _selectedSubjectName;
@@ -37,7 +36,6 @@ class _FeedScreenState extends State<FeedScreen> {
   String? _gradeId;
   String? _medium;
 
-  // Use ValueNotifier for title visibility to hide it on scroll while keep avatar permanent
   final ValueNotifier<bool> _showTitle = ValueNotifier<bool>(true);
   final ScrollController _scrollController = ScrollController();
 
@@ -56,7 +54,6 @@ class _FeedScreenState extends State<FeedScreen> {
   }
 
   void _onScroll() {
-    // Hide title when scrolled down to allow space in pinned header
     if (_scrollController.offset > 60 && _showTitle.value) {
       _showTitle.value = false;
     } else if (_scrollController.offset <= 60 && !_showTitle.value) {
@@ -65,7 +62,6 @@ class _FeedScreenState extends State<FeedScreen> {
   }
 
   Future<void> _loadFeed() async {
-    // Only show full screen loading if this is the first load
     if (_posts.isEmpty && mounted) setState(() => _isLoading = true);
 
     try {
@@ -76,11 +72,6 @@ class _FeedScreenState extends State<FeedScreen> {
         if (mounted) setState(() => _isLoading = false);
         return;
       }
-
-      // 1. Fetch User Details for Filtering
-      // We can get this from a UserProvider if available,
-      // but for now we'll do a quick fetch or use the one in AuthService if it stores full model
-      // AuthService _user is just `User` (Auth).
 
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
@@ -96,7 +87,6 @@ class _FeedScreenState extends State<FeedScreen> {
             : null;
       });
 
-      // 2. Fetch Community Posts (Filtered by feed type)
       List<PostModel> posts = [];
 
       if (_feedFilter == 'trending') {
@@ -113,14 +103,12 @@ class _FeedScreenState extends State<FeedScreen> {
           limit: 50,
         );
       } else {
-        // 'all' or 'following'
         posts = await _apiService.getFeedPosts(
           gradeId: _gradeId,
           medium: _medium,
           limit: 50,
         );
 
-        // Filter by following if needed
         if (_feedFilter == 'following') {
           final followingSnapshot = await FirebaseFirestore.instance
               .collection('users')
@@ -161,7 +149,6 @@ class _FeedScreenState extends State<FeedScreen> {
           child: CustomScrollView(
             controller: _scrollController,
             slivers: [
-              // --- App Bar ---
               SliverAppBar(
                 expandedHeight: 120.h,
                 floating: false,
@@ -328,7 +315,6 @@ class _FeedScreenState extends State<FeedScreen> {
                 ],
               ),
 
-              // 🚀 Feed Filter Chips
               if (_feedFilter != 'all' || _selectedSubjectId != null)
                 SliverToBoxAdapter(
                   child: Container(
@@ -409,7 +395,6 @@ class _FeedScreenState extends State<FeedScreen> {
                   ),
                 ),
 
-              // --- Content ---
               _buildFeedContent(theme, _gradeId, _medium),
             ],
           ),
@@ -421,7 +406,6 @@ class _FeedScreenState extends State<FeedScreen> {
   Widget _buildFeedContent(ThemeData theme, String? gradeId, String? medium) {
     if (_isLoading) return _buildShimmerList(theme);
 
-    // For filtered views, use real-time streams where possible
     if (_feedFilter == 'all' ||
         (_feedFilter == 'subject' && _selectedSubjectId != null) ||
         ['question', 'resource', 'poll', 'verified'].contains(_feedFilter)) {
@@ -492,7 +476,6 @@ class _FeedScreenState extends State<FeedScreen> {
                           post.postId,
                         ),
                       );
-                      // Refresh feed to sync any changes made in details
                       if (mounted && _feedFilter != 'all') {
                         _loadFeed();
                       }
@@ -507,7 +490,6 @@ class _FeedScreenState extends State<FeedScreen> {
       );
     }
 
-    // Fallback for other filters (Future-based)
     if (_posts.isEmpty) return _buildEmptyState(theme);
 
     return SliverList(
@@ -541,7 +523,6 @@ class _FeedScreenState extends State<FeedScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // --- Premium Illustration ---
             Stack(
               alignment: Alignment.center,
               children: [
@@ -599,7 +580,6 @@ class _FeedScreenState extends State<FeedScreen> {
 
             SizedBox(height: 48.h),
 
-            // --- Text Content ---
             Text(
               'No Posts Yet',
               style: theme.textTheme.headlineMedium?.copyWith(
@@ -624,7 +604,6 @@ class _FeedScreenState extends State<FeedScreen> {
 
             SizedBox(height: 48.h),
 
-            // --- Call to Action ---
             Container(
               width: double.infinity,
               height: 56.h,
@@ -719,15 +698,12 @@ class _FeedScreenState extends State<FeedScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Avatar
                 CircleAvatar(backgroundColor: Colors.white, radius: 20.r),
                 SizedBox(width: 12.w),
-                // Content
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Name & Handle
                       Row(
                         children: [
                           Container(
@@ -744,7 +720,6 @@ class _FeedScreenState extends State<FeedScreen> {
                         ],
                       ),
                       SizedBox(height: 8.h),
-                      // Body Text Lines
                       Container(
                         height: 10.h,
                         width: double.infinity,
@@ -757,7 +732,6 @@ class _FeedScreenState extends State<FeedScreen> {
                         color: Colors.white,
                       ),
                       SizedBox(height: 12.h),
-                      // Optional Image Placeholder (on some items)
                       if (index % 2 == 0) ...[
                         Container(
                           height: 150.h,
@@ -769,7 +743,6 @@ class _FeedScreenState extends State<FeedScreen> {
                         ),
                         SizedBox(height: 12.h),
                       ],
-                      // Actions Row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: List.generate(

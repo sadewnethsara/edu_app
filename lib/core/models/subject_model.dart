@@ -1,4 +1,3 @@
-/// Subject model within a grade
 class SubjectModel {
   final String id;
   final String gradeId;
@@ -26,7 +25,6 @@ class SubjectModel {
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
       icon: json['icon'] as String?,
-      // ✅ FIXED: Handle both bool and bool? from Firestore
       isActive: (json['isActive'] == true || json['isActive'] == null)
           ? true
           : false,

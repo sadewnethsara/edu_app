@@ -17,13 +17,11 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    // Professional animation standard: 0.8s - 1.2s
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
 
-    // Fade in ease-out
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -31,7 +29,6 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    // Subtle slide up
     _slideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
           CurvedAnimation(
@@ -51,13 +48,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Access theme data for proper light/dark mode support
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // Define professional typography styles directly here for isolation
-    // or use Theme.of(context).textTheme if strictly required.
-    // For a splash, custom high-end typography is often preferred.
     final titleStyle = TextStyle(
       fontSize: 32,
       fontWeight: FontWeight.w700,
@@ -77,7 +70,6 @@ class _SplashScreenState extends State<SplashScreen>
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      // Ensure status bar color matches
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -96,7 +88,6 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Brand Icon Container
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
@@ -108,16 +99,12 @@ class _SplashScreenState extends State<SplashScreen>
                       child: Icon(
                         Icons.calculate_rounded,
                         size: 64,
-                        // Use theme primary color or monochrome for "billion dollar" simple look.
-                        // Often top apps use monochrome logos on splash.
                         color: isDark ? Colors.white : Colors.black,
                       ),
                     ),
                     const SizedBox(height: 32),
-                    // App Name
                     Text('Math World', style: titleStyle),
                     const SizedBox(height: 12),
-                    // Tagline / Subtitle
                     Text('LEARN & MASTER', style: subtitleStyle),
                   ],
                 ),
@@ -125,7 +112,6 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           ),
 
-          // Subtle Loading Indicator at bottom
           Positioned(
             bottom: 60,
             left: 0,

@@ -1,8 +1,5 @@
 import 'package:logger/logger.dart';
 
-/// 🚀 GLOBAL LOGGER
-/// Custom configured logger for the entire application.
-/// Uses the 'logger' package to provide beautiful, color-coded console output.
 final logger = Logger(
   printer: PrettyPrinter(
     methodCount: 2, // Number of method calls in the stack trace
@@ -12,12 +9,9 @@ final logger = Logger(
     printEmojis: true, // Use emojis to distinguish log levels
     dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
   ),
-  // Only log if we are in debug mode to protect production performance
   filter: DevelopmentFilter(),
 );
 
-/// 📈 APP LOG CLASS
-/// A wrapper for more structured logging across the app.
 class AppLog {
   static void d(String message) => logger.d(message);
   static void i(String message) => logger.i(message);

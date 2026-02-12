@@ -8,19 +8,19 @@ enum PostCategory { question, discussion, resource, achievement, general }
 
 class PollData {
   final List<String> options;
-  final List<int> voteCounts; // 🚀 Added
-  final int totalVotes; // 🚀 Added
+  final List<int> voteCounts;
+  final int totalVotes;
   final int lengthDays;
   final Timestamp endsAt;
-  final bool allowMultipleVotes; // 🚀 Added
+  final bool allowMultipleVotes;
 
   PollData({
     required this.options,
-    this.voteCounts = const [], // Default empty
-    this.totalVotes = 0, // Default 0
+    this.voteCounts = const [],
+    this.totalVotes = 0,
     required this.lengthDays,
     required this.endsAt,
-    this.allowMultipleVotes = false, // Default false
+    this.allowMultipleVotes = false,
   });
 
   Map<String, dynamic> toJson() => {
@@ -55,37 +55,33 @@ class PostModel {
   final Timestamp createdAt;
   final int likeCount;
   final int replyCount;
-  final int reShareCount; // 🚀 Added
-  final int viewCount; // 🚀 Added
-  final int shareCount; // 🚀 Added
+  final int reShareCount;
+  final int viewCount;
+  final int shareCount;
   final ReplyPermission replyPermission;
   final PollData? pollData;
   final Timestamp? expiresAt;
   final bool commentsDisabled;
   final bool sharingDisabled;
   final bool resharingDisabled;
-  final String? videoUrl; // 🚀 Added
-  final String? linkUrl; // 🚀 Added
-  final List<String> mentions; // 🚀 User IDs of mentioned/tagged users
-  final List<String> mentionedNames; // 🚀 Display names for quick access
+  final String? videoUrl;
+  final String? linkUrl;
+  final List<String> mentions;
+  final List<String> mentionedNames;
 
-  // 🚀 --- Re-share Fields ---
   final String? originalPostId;
   final PostModel? originalPost;
 
-  // 🚀 --- Filter Fields ---
   final String? gradeId;
   final String? medium;
 
-  // 🚀 --- Enhanced Community Fields ---
   final String? subjectId;
-  final String? subjectName; // For display
-  final List<String> tags; // Topic tags (e.g., ["algebra", "geometry"])
-  final PostCategory category; // Question, Discussion, Resource, etc.
-  final int helpfulAnswerCount; // Number of helpful answers marked
-  final String? helpfulAnswerId; // ID of the answer marked as helpful by author
+  final String? subjectName;
+  final List<String> tags;
+  final PostCategory category;
+  final int helpfulAnswerCount;
+  final String? helpfulAnswerId;
 
-  // 🚀 --- New Community Feature Fields ---
   final String? communityId;
   final String? communityName;
   final String? communityIcon;
@@ -250,7 +246,6 @@ class PostModel {
   factory PostModel.fromSnapshot(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>? ?? {};
 
-    // Handle legacy single image or new list
     List<String> images = [];
     if (data['imageUrls'] != null) {
       images = List<String>.from(data['imageUrls']);
@@ -361,7 +356,6 @@ class PostModel {
   }
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
-    // Handle legacy single image or new list
     List<String> images = [];
     if (json['imageUrls'] != null) {
       images = List<String>.from(json['imageUrls']);

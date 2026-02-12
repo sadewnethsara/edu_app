@@ -1,9 +1,8 @@
-/// Content item model (videos, notes, PDFs, resources)
 class ContentItem {
   final String id;
   final String name;
   final String url;
-  final String type; // 'upload' or 'url'
+  final String type;
   final String? fileName;
   final String? thumbnail;
   final String language;
@@ -26,17 +25,16 @@ class ContentItem {
 
   factory ContentItem.fromJson(Map<String, dynamic> json) {
     return ContentItem(
-      // ✅ UPDATED: Safe parsing with default values
       id: json['id']?.toString() ?? '',
       name:
           json['name']?.toString() ??
           json['fileName']?.toString() ??
           'Untitled', // Fallback
       url: json['url']?.toString() ?? '',
-      type: json['type']?.toString() ?? 'url', // Default to 'url'
+      type: json['type']?.toString() ?? 'url',
       fileName: json['fileName'] as String?,
       thumbnail: json['thumbnail'] as String?,
-      language: json['language']?.toString() ?? 'en', // Default to 'en'
+      language: json['language']?.toString() ?? 'en',
       uploadedAt:
           json['uploadedAt']?.toString() ??
           DateTime.now().toIso8601String(), // Fallback
@@ -63,7 +61,6 @@ class ContentItem {
   }
 }
 
-/// Content collection for lessons/subtopics
 class ContentCollection {
   final List<ContentItem> videos;
   final List<ContentItem> notes;
@@ -79,7 +76,6 @@ class ContentCollection {
 
   factory ContentCollection.fromJson(Map<String, dynamic> json) {
     return ContentCollection(
-      // This logic was already correct and safe
       videos: json['videos'] != null
           ? (json['videos'] as List)
                 .map((e) => ContentItem.fromJson(e as Map<String, dynamic>))
@@ -106,7 +102,6 @@ class ContentCollection {
   int get totalCount =>
       videos.length + notes.length + contentPdfs.length + resources.length;
 
-  // 🚀 ADDED: Helper for the scroll error fix
   int get allItemCount {
     int count = 0;
     if (videos.isNotEmpty) count++;

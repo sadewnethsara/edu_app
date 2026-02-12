@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_auth/firebase_auth.dart'; // Removed
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -74,9 +73,6 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
     try {
       if (mounted) setState(() => _isLoading = true);
 
-      // Define futures for parallel execution
-
-      // 1. Grade Name Future
       final gradeNameFuture = FirebaseFirestore.instance
           .collection('curricula')
           .doc(_selectedLanguage)
@@ -84,7 +80,6 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
           .doc(widget.gradeId)
           .get();
 
-      // 2. Subject Name Future
       final subjectNameFuture = () async {
         DocumentSnapshot doc = await FirebaseFirestore.instance
             .collection('grades')
@@ -106,7 +101,6 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
         return doc;
       }();
 
-      // 3. Lesson Name Future
       final lessonNameFuture = () async {
         DocumentSnapshot doc = await FirebaseFirestore.instance
             .collection('grades')
@@ -132,7 +126,6 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
         return doc;
       }();
 
-      // 4. Content Future
       final contentFuture = _apiService.getLessonContent(
         widget.gradeId,
         widget.subjectId,
@@ -141,7 +134,6 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
         forceRefresh: forceRefresh,
       );
 
-      // Execute in parallel
       final results = await Future.wait([
         gradeNameFuture,
         subjectNameFuture,
@@ -200,7 +192,6 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
   void _applySearchAndSort() {
     if (_content == null) return;
 
-    // First, filter by search query
     List<ContentItem> filterList(List<ContentItem> list) {
       if (_searchQuery.isEmpty) {
         return List.from(list);
@@ -213,13 +204,11 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
           .toList();
     }
 
-    // Create filtered content
     final filteredVideos = filterList(_content!.videos);
     final filteredNotes = filterList(_content!.notes);
     final filteredPdfs = filterList(_content!.contentPdfs);
     final filteredResources = filterList(_content!.resources);
 
-    // Then sort
     void sortList(List<ContentItem> list) {
       switch (_selectedSort) {
         case 'A-Z':
@@ -373,7 +362,6 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
     );
   }
 
-  // Helper to filter content
   List<Map<String, dynamic>> _getFilteredItems() {
     final contentToUse = _filteredContent ?? _content;
     if (contentToUse == null) return [];
@@ -487,7 +475,6 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                 },
               ),
 
-              // Search Bar
               SliverToBoxAdapter(
                 child: _isLoading
                     ? const SearchBarShimmer()
@@ -499,7 +486,6 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                       ),
               ),
 
-              // 🚀 2. Filter Chips (Modern Tabs)
               if (!_isLoading)
                 SliverToBoxAdapter(
                   child: Padding(
@@ -545,7 +531,6 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                   ),
                 ),
 
-              // 🚀 3. Content List
               _isLoading
                   ? const ContentListShimmer(itemHeight: 76)
                   : filteredItems.isEmpty
@@ -586,7 +571,6 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
           ),
         ),
       ),
-      // 🚀 4. Floating Action Button for Subtopics
       floatingActionButton: _isLoading
           ? Container(
               height: 48.h,

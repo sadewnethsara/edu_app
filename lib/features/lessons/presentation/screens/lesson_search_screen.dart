@@ -26,11 +26,9 @@ class _LessonSearchScreenState extends State<LessonSearchScreen> {
   bool _isInitializing = true;
   List<LessonModel> _searchResults = [];
 
-  // User's default settings
   String _selectedLanguage = 'en';
   String? _selectedGradeId;
 
-  // Available options
   List<GradeModel> _availableGrades = [];
   final List<String> _availableLanguages = ['en', 'si', 'ta'];
   final Map<String, String> _languageNames = {
@@ -39,7 +37,6 @@ class _LessonSearchScreenState extends State<LessonSearchScreen> {
     'ta': 'Tamil',
   };
 
-  // Filter states
   bool _filterAllGrades = false;
 
   @override
@@ -80,7 +77,6 @@ class _LessonSearchScreenState extends State<LessonSearchScreen> {
         }
       }
 
-      // Load available grades
       final allGrades = await _apiService.getGrades(_selectedLanguage);
       setState(() {
         _availableGrades = allGrades;
@@ -201,7 +197,6 @@ class _LessonSearchScreenState extends State<LessonSearchScreen> {
       ),
       body: Column(
         children: [
-          // Filter Chips
           if (!_isInitializing)
             Container(
               width: double.infinity,
@@ -250,7 +245,6 @@ class _LessonSearchScreenState extends State<LessonSearchScreen> {
               ),
             ),
 
-          // Search Results
           Expanded(child: _buildContent(theme)),
         ],
       ),
@@ -383,9 +377,6 @@ class _LessonSearchScreenState extends State<LessonSearchScreen> {
   Widget _buildLessonCard(ThemeData theme, LessonModel lesson) {
     return InkWell(
       onTap: () {
-        // Navigate to lesson content
-        // You'll need to pass gradeId and subjectId
-        // For now, just pop back
         Navigator.pop(context);
       },
       borderRadius: BorderRadius.circular(16.r),
@@ -451,7 +442,6 @@ class _LessonSearchScreenState extends State<LessonSearchScreen> {
   }
 }
 
-// Filter Bottom Sheet Widget
 class _FilterBottomSheet extends StatefulWidget {
   final String? selectedGradeId;
   final String selectedLanguage;
@@ -523,7 +513,6 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Drag Handle
             Center(
               child: Container(
                 width: 40.w,
@@ -538,7 +527,6 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
               ),
             ),
 
-            // Header
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
               child: Row(
@@ -552,7 +540,6 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                     ),
                   ),
                   const Spacer(),
-                  // Reset Button
                   TextButton(
                     onPressed: () {
                       setState(() {
@@ -570,7 +557,6 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                     ),
                   ),
                   SizedBox(width: 8.w),
-                  // Close Button
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: Icon(
@@ -611,7 +597,6 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Grade Section
                       _buildSectionTitle(context, 'Grade'),
                       SizedBox(height: 12.h),
                       Wrap(
@@ -651,7 +636,6 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                       ),
                       SizedBox(height: 24.h),
 
-                      // Language Section
                       _buildSectionTitle(context, 'Language'),
                       SizedBox(height: 12.h),
                       Wrap(
@@ -676,7 +660,6 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
               ),
             ),
 
-            // Apply Button
             Padding(
               padding: EdgeInsets.all(20.w),
               child: StyledButton(
@@ -718,7 +701,6 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   ) {
     final theme = Theme.of(context);
 
-    // Define colors for 3D effect
     final faceColor = isSelected
         ? theme.primaryColor
         : isDark

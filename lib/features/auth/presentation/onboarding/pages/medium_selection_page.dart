@@ -44,7 +44,6 @@ class _MediumSelectionPageState extends State<MediumSelectionPage> {
           _isLoading = false;
         });
       } else {
-        // If no active languages found, use defaults
         setState(() {
           _languages = _getDefaultLanguages();
           _isLoading = false;
@@ -84,7 +83,6 @@ class _MediumSelectionPageState extends State<MediumSelectionPage> {
     ];
   }
 
-  // Icon mapping based on language code
   String _getIcon(String code) {
     switch (code) {
       case 'en':
@@ -100,7 +98,6 @@ class _MediumSelectionPageState extends State<MediumSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Get theme properties
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -112,7 +109,6 @@ class _MediumSelectionPageState extends State<MediumSelectionPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. Icon and Heading
           Center(
             child: AnimatedEmoji(
               AnimatedEmojis.graduationCap,
@@ -122,7 +118,6 @@ class _MediumSelectionPageState extends State<MediumSelectionPage> {
           ),
           SizedBox(height: 16.h),
 
-          // 🏷️ Title
           Text(
             "Select Your Learning Language",
             style: textTheme.headlineMedium?.copyWith(
@@ -134,7 +129,6 @@ class _MediumSelectionPageState extends State<MediumSelectionPage> {
           ),
           SizedBox(height: 8.h),
 
-          // 🧾 Subtitle
           Text(
             "Choose the language you’d like to use while exploring lessons and resources.",
             style: textTheme.bodyLarge?.copyWith(
@@ -145,7 +139,6 @@ class _MediumSelectionPageState extends State<MediumSelectionPage> {
           ),
           SizedBox(height: 24.h),
 
-          // Loading shimmer or actual content
           if (_isLoading)
             Column(children: List.generate(3, (index) => _buildShimmerTile()))
           else if (_languages.isEmpty)
@@ -177,7 +170,6 @@ class _MediumSelectionPageState extends State<MediumSelectionPage> {
               }).toList(),
             ),
 
-          // 4. Error Message
           if (isError)
             Padding(
               padding: EdgeInsets.only(top: 16.h),
@@ -196,7 +188,6 @@ class _MediumSelectionPageState extends State<MediumSelectionPage> {
     );
   }
 
-  // Shimmer loading tile
   Widget _buildShimmerTile() {
     final theme = Theme.of(context);
 
@@ -217,7 +208,6 @@ class _MediumSelectionPageState extends State<MediumSelectionPage> {
   }
 }
 
-// --- Custom Widget for Medium Selection (Duolingo Style Tile) ---
 class MediumSelectionTile extends StatelessWidget {
   final String label;
   final String icon;
@@ -236,7 +226,6 @@ class MediumSelectionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get theme properties
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -294,7 +283,6 @@ class MediumSelectionTile extends StatelessWidget {
                 ),
               ],
             ),
-            // Selection indicator
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
               child: isSelected

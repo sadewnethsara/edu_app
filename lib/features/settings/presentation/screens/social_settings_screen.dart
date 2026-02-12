@@ -51,7 +51,6 @@ class _SocialSettingsScreenState extends State<SocialSettingsScreen> {
   Future<void> _updateSetting(String key, dynamic value) async {
     if (_userModel == null) return;
 
-    // Optimistic update
     setState(() {
       final json = _userModel!.toJson();
       json[key] = value;
@@ -68,7 +67,6 @@ class _SocialSettingsScreenState extends State<SocialSettingsScreen> {
         );
       }
     } catch (e) {
-      // Revert on failure
       _loadUserData();
       if (mounted) {
         MessageBanner.show(

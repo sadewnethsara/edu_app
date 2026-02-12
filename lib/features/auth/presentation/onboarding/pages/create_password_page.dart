@@ -48,7 +48,6 @@ class _CreatePasswordPageState extends State<CreatePasswordPage> {
           ),
           SizedBox(height: 32.h),
 
-          // Password Field
           TextField(
             onChanged: widget.onPasswordChanged,
             obscureText: !_isPasswordVisible,
@@ -71,7 +70,6 @@ class _CreatePasswordPageState extends State<CreatePasswordPage> {
           ),
           SizedBox(height: 16.h),
 
-          // Confirm Password Field
           TextField(
             onChanged: widget.onConfirmPasswordChanged,
             obscureText: !_isConfirmVisible,

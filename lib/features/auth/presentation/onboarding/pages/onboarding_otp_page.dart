@@ -27,8 +27,6 @@ class _OnboardingOtpPageState extends State<OnboardingOtpPage> {
     setState(() => _isResending = true);
     try {
       widget.onResendTapped();
-      // We don't set isResending=false here, we let the parent show a snackbar
-      // and we just re-enable the button after a timeout to prevent spam.
       await Future.delayed(const Duration(seconds: 10));
     } finally {
       if (mounted) {
@@ -41,7 +39,6 @@ class _OnboardingOtpPageState extends State<OnboardingOtpPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // --- (All your Pinput theme code is correct, no changes there) ---
     final defaultPinTheme = PinTheme(
       width: 45.w,
       height: 56.h,
@@ -112,7 +109,6 @@ class _OnboardingOtpPageState extends State<OnboardingOtpPage> {
             ),
           SizedBox(height: 24.h),
 
-          // --- RESEND BUTTON LOGIC ---
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

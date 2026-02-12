@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_auth/firebase_auth.dart'; // Removed
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -68,9 +67,6 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
         '🔍 SubtopicsScreen: Fetching for lesson=${widget.lessonId}, language=$_selectedLanguage',
       );
 
-      // Define futures for parallel execution
-
-      // 1. Grade Name Future
       final gradeNameFuture = FirebaseFirestore.instance
           .collection('curricula')
           .doc(_selectedLanguage)
@@ -78,7 +74,6 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
           .doc(widget.gradeId)
           .get();
 
-      // 2. Subject Name Future
       final subjectNameFuture = () async {
         DocumentSnapshot doc = await FirebaseFirestore.instance
             .collection('grades')
@@ -100,7 +95,6 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
         return doc;
       }();
 
-      // 3. Lesson Name Future
       final lessonNameFuture = () async {
         DocumentSnapshot doc = await FirebaseFirestore.instance
             .collection('grades')
@@ -126,7 +120,6 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
         return doc;
       }();
 
-      // 4. Subtopics List Future
       final subtopicsFuture = _apiService.getSubtopics(
         widget.gradeId,
         widget.subjectId,
@@ -135,7 +128,6 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
         forceRefresh: forceRefresh,
       );
 
-      // Execute in parallel
       final results = await Future.wait([
         gradeNameFuture,
         subjectNameFuture,
@@ -150,7 +142,6 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
       final lessonDoc = results[2] as DocumentSnapshot;
       final subtopics = results[3] as List<SubtopicModel>;
 
-      // Process Grade Name
       if (gradeDoc.exists) {
         _gradeName = gradeDoc.data() is Map
             ? ((gradeDoc.data() as Map<String, dynamic>)['name'] ?? 'Grade')
@@ -160,13 +151,11 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
             'Grade ${widget.gradeId.replaceAll(RegExp(r'[^0-9]'), '')}';
       }
 
-      // Process Subject Name
       if (subjectDoc.exists) {
         _subjectName =
             (subjectDoc.data() as Map<String, dynamic>?)?['name'] ?? 'Subject';
       }
 
-      // Process Lesson Name
       if (lessonDoc.exists) {
         _lessonName =
             (lessonDoc.data() as Map<String, dynamic>?)?['name'] ?? 'Lesson';
@@ -292,7 +281,6 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
                 },
               ),
 
-              // Search Bar
               SliverToBoxAdapter(
                 child: _isLoading
                     ? const SearchBarShimmer()
@@ -304,7 +292,6 @@ class _SubtopicsScreenState extends State<SubtopicsScreen> {
                       ),
               ),
 
-              // Content
               _isLoading
                   ? const ContentListShimmer(itemHeight: 140)
                   : _filteredSubtopics.isEmpty

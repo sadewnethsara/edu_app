@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Defines a single achievement level
 class Achievement {
   final String name;
   final String description;
@@ -17,8 +16,6 @@ class Achievement {
   });
 }
 
-/// Static helper class to hold all achievement data.
-/// The [key] (e.g., 'points') MUST match the key in the user's Firestore document.
 class AchievementsData {
   static final Map<String, List<Achievement>> allAchievements = {
     'points': [
@@ -92,7 +89,6 @@ class AchievementsData {
     ],
   };
 
-  /// Helper to get the achievement data for a specific level
   static Achievement? getAchievement(String type, int level) {
     if (level <= 0) return null;
     final levels = allAchievements[type];
@@ -100,7 +96,6 @@ class AchievementsData {
     return levels[level - 1]; // level 1 is at index 0
   }
 
-  /// Helper to get the NEXT achievement level
   static Achievement? getNextAchievement(String type, int level) {
     final levels = allAchievements[type];
     if (levels == null || level >= levels.length) return null; // No next level

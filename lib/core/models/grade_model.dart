@@ -1,4 +1,3 @@
-/// Grade model representing academic grades
 class GradeModel {
   final String id;
   final int order;
@@ -20,7 +19,6 @@ class GradeModel {
       order: json['order'] as int? ?? 0,
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
-      // ✅ FIXED: Handle both bool and bool? from Firestore
       isActive: (json['isActive'] == true || json['isActive'] == null)
           ? true
           : false,

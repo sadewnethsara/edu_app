@@ -1,4 +1,3 @@
-/// Content counts for a lesson
 class ContentCounts {
   final int videos;
   final int notes;
@@ -33,7 +32,6 @@ class ContentCounts {
   int get total => videos + notes + contentPdfs + resources;
 }
 
-/// Lesson model within a subject
 class LessonModel {
   final String id;
   final String subjectId;
@@ -71,7 +69,6 @@ class LessonModel {
             )
           : null,
       language: json['language'] as String?,
-      // ✅ FIXED: Handle both bool and bool? from Firestore
       isActive: (json['isActive'] == true || json['isActive'] == null)
           ? true
           : false,

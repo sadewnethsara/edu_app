@@ -18,7 +18,6 @@ class UserModel {
   final int followingCount;
   final int postCount;
 
-  // Privacy & Settings
   final bool isPrivateAccount;
   final List<String> mutedUsers;
   final List<String> blockedUsers;
@@ -26,7 +25,6 @@ class UserModel {
   final bool allowTagging;
   final bool autoplayVideos;
   final String? bio;
-  // 🚀 --- END OF ADDED FIELDS --- 🚀
 
   UserModel({
     required this.uid,
@@ -42,7 +40,6 @@ class UserModel {
     this.completionPercent = 0.0,
     this.createdAt,
     this.achievements = const {},
-    // 🚀 ADDED TO CONSTRUCTOR
     this.followersCount = 0,
     this.followingCount = 0,
     this.postCount = 0,
@@ -80,7 +77,6 @@ class UserModel {
       createdAt: json['createdAt'] as Timestamp?,
       achievements: achievementsMap,
 
-      // 🚀 ADDED TO FROMJSON
       followersCount: json['followersCount'] as int? ?? 0,
       followingCount: json['followingCount'] as int? ?? 0,
       postCount: json['postCount'] as int? ?? 0,

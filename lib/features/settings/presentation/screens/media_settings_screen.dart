@@ -7,14 +7,6 @@ class MediaSettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Ensure SettingsService provider is available higher up or rely on simple instance usage if simple singleton
-    // But ideally wrap in Provider or ChangeNotifierProvider in main.dart
-    // For now, let's assume valid instance or rebuild on change.
-    // The SettingsService is a ChangeNotifier.
-
-    // We need to listen to SettingsService changes.
-    // If not provided via Provider, we can use AnimatedBuilder with singleton.
-
     return Scaffold(
       appBar: AppBar(title: const Text('Media Quality')),
       body: AnimatedBuilder(

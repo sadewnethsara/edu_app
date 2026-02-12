@@ -1,6 +1,5 @@
 import 'package:math/core/models/lesson_model.dart';
 
-/// Subtopic model within a lesson
 class SubtopicModel {
   final String id;
   final String lessonId;
@@ -28,7 +27,6 @@ class SubtopicModel {
 
   factory SubtopicModel.fromJson(Map<String, dynamic> json) {
     return SubtopicModel(
-      // ✅ UPDATED: Safe parsing, prevents crashes from null data
       id: json['id']?.toString() ?? '',
       lessonId: json['lessonId']?.toString() ?? '',
       subjectId: json['subjectId']?.toString() ?? '',
@@ -41,9 +39,7 @@ class SubtopicModel {
               json['contentCounts'] as Map<String, dynamic>,
             )
           : null,
-      // ✅ ADDED: Assumes 'en' as default if not specified
       language: json['language']?.toString() ?? 'en',
-      // ✅ FIXED: Handle both bool and bool? from Firestore
       isActive: (json['isActive'] == true || json['isActive'] == null)
           ? true
           : false,
@@ -59,7 +55,6 @@ class SubtopicModel {
       'order': order,
       'name': name,
       'description': description,
-      // ✅ UPDATED: Simpler and correct, assumes ContentCounts has toJson()
       if (contentCounts != null) 'contentCounts': contentCounts!.toJson(),
       'language': language, // <-- ADDED
       'isActive': isActive,

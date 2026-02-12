@@ -31,7 +31,6 @@ class _LanguagePageState extends State<LanguagePage> {
   @override
   void initState() {
     super.initState();
-    // Don't pre-select any language - force user to explicitly choose
   }
 
   @override

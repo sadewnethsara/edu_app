@@ -43,7 +43,6 @@ class _WebViewScreenState extends State<WebViewScreen> {
     super.initState();
     _pageTitle = widget.title ?? widget.url;
 
-    // Ensure URL has a scheme
     String finalUrl = widget.url;
     if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
       finalUrl = 'https://$finalUrl';

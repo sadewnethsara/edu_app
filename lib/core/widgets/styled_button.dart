@@ -23,10 +23,8 @@ class StyledButton extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    // A button is disabled if explicitly set OR if it's loading
     final bool isEffectivelyDisabled = isDisabled || isLoading;
 
-    // Base colors from the theme
     final Color buttonColor = isEffectivelyDisabled
         ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
         : (isPrimary
@@ -44,7 +42,6 @@ class StyledButton extends StatelessWidget {
         : (isPrimary ? colorScheme.primary : colorScheme.secondary);
 
     return ElevatedButton(
-      // Disable onPressed if effectively disabled
       onPressed: isEffectivelyDisabled ? null : onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: buttonColor,
@@ -62,7 +59,6 @@ class StyledButton extends StatelessWidget {
           letterSpacing: 0.2,
         ),
       ),
-      // --- UPDATED CHILD ---
       child: isLoading
           ? SizedBox(
               width: 24.h, // Constrain size of indicator

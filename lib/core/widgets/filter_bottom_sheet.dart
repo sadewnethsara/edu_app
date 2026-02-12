@@ -70,7 +70,6 @@ class FilterBottomSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Drag Handle
             Center(
               child: Container(
                 width: 40.w,
@@ -85,7 +84,6 @@ class FilterBottomSheet extends StatelessWidget {
               ),
             ),
 
-            // Header
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
               child: Row(
@@ -99,7 +97,6 @@ class FilterBottomSheet extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  // Reset Button
                   TextButton(
                     onPressed: () {
                       onReset();
@@ -113,7 +110,6 @@ class FilterBottomSheet extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 8.w),
-                  // Close Button
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: Icon(
@@ -156,7 +152,6 @@ class FilterBottomSheet extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Grade Section
                       _buildSectionTitle(context, 'Grade'),
                       SizedBox(height: 12.h),
                       Wrap(
@@ -239,7 +234,6 @@ class FilterBottomSheet extends StatelessWidget {
               ),
             ),
 
-            // Apply Button
             Padding(
               padding: EdgeInsets.all(20.w),
               child: StyledButton(
@@ -274,7 +268,6 @@ class FilterBottomSheet extends StatelessWidget {
   ) {
     final theme = Theme.of(context);
 
-    // Define colors for 3D effect
     final faceColor = isSelected
         ? theme.primaryColor
         : isDark

@@ -16,17 +16,12 @@ class NotificationSettingsScreen extends StatefulWidget {
 
 class _NotificationSettingsScreenState
     extends State<NotificationSettingsScreen> {
-  // Local state for toggles
   bool _qualityFilter = true;
   bool _unreadCountBadge = true;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Use specific colors to match the "X" dark mode aesthetic if requested,
-    // otherwise stick to App Theme.
-    // The user mentioned "app color change like that images in dark mode".
-    // We'll try to keep it consistent with the current app theme but ensure it looks premium.
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -50,7 +45,6 @@ class _NotificationSettingsScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- FILTERS SECTION ---
             _buildSectionHeader(theme, "Filters"),
             Card(
               elevation: 0,
@@ -142,7 +136,6 @@ class _NotificationSettingsScreenState
 
             SizedBox(height: 24.h),
 
-            // --- PREFERENCES SECTION ---
             _buildSectionHeader(theme, "Preferences"),
             Card(
               elevation: 0,

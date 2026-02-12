@@ -30,7 +30,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _otpController = TextEditingController();
   bool _isLoading = false;
 
-  // UI State
   LoginStep _currentStep = LoginStep.identifier; // 🚀 Use enum
   bool _showCreateAccount = false;
   bool _obscurePassword = true;
@@ -74,7 +73,6 @@ class _LoginScreenState extends State<LoginScreen> {
     MessageBanner.show(context, message: message, type: MessageType.error);
   }
 
-  /// Handles the "CONTINUE" button tap
   Future<void> _handleContinue() async {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
@@ -88,7 +86,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final String identifier = _identifierController.text.trim();
 
     if (identifier.contains('@')) {
-      // --- EMAIL LOGIC ---
       final bool emailExists = await authService.checkEmailExists(identifier);
       if (emailExists) {
         setState(() {
@@ -100,13 +97,11 @@ class _LoginScreenState extends State<LoginScreen> {
           _showCreateAccount = true;
           _isLoading = false;
         });
-        // Automatically show the bottom sheet
         if (mounted) {
           _showCreateAccountSheet(context);
         }
       }
     } else {
-      // --- PHONE LOGIC ---
       String formattedPhone = identifier;
       if (formattedPhone.startsWith('0')) {
         formattedPhone = '+94${formattedPhone.substring(1)}';
@@ -114,13 +109,11 @@ class _LoginScreenState extends State<LoginScreen> {
         formattedPhone = '+94$formattedPhone';
       }
 
-      // Check if phone number exists
       final bool phoneExists = await authService.checkPhoneExists(
         formattedPhone,
       );
 
       if (phoneExists) {
-        // Phone exists - send OTP for login
         try {
           if (!mounted) return;
           await authService.sendOtpToPhone(context, formattedPhone);
@@ -133,7 +126,6 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() => _isLoading = false);
         }
       } else {
-        // Phone doesn't exist - show create account sheet
         setState(() {
           _showCreateAccount = true;
           _isLoading = false;
@@ -145,7 +137,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  /// Handles the "LOG IN" button tap
   Future<void> _submitPasswordLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -161,10 +152,8 @@ class _LoginScreenState extends State<LoginScreen> {
       _showError(error);
       if (mounted) setState(() => _isLoading = false);
     }
-    // On success, auth listener will redirect
   }
 
-  /// Handles the "VERIFY OTP" button tap
   Future<void> _submitOtpLogin() async {
     if (_otpController.text.trim().length < 6) {
       _showError("Please enter the 6-digit OTP.");
@@ -190,7 +179,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final error = await context.read<AuthService>().signInWithGoogle();
 
     if (error == "USER_NOT_FOUND") {
-      // Google user doesn't exist in Firestore - show create account sheet
       setState(() {
         _isLoading = false;
         _showCreateAccount = true;
@@ -199,11 +187,9 @@ class _LoginScreenState extends State<LoginScreen> {
         _showCreateAccountSheet(context);
       }
     } else if (error != null) {
-      // Other errors - show error message
       _showError(error);
       setState(() => _isLoading = false);
     } else {
-      // Success - loading state will be cleared by auth listener
       if (mounted) setState(() => _isLoading = false);
     }
   }
@@ -217,7 +203,6 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  // 🚀 --- NEW WIDGET: Animated Form Body --- 🚀
   Widget _buildAnimatedForm(ThemeData theme) {
     Widget currentForm;
     switch (_currentStep) {
@@ -234,13 +219,11 @@ class _LoginScreenState extends State<LoginScreen> {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       transitionBuilder: (child, animation) {
-        // Slide in from the right
         final offsetAnimation = Tween<Offset>(
           begin: const Offset(1.0, 0.0),
           end: Offset.zero,
         ).animate(animation);
 
-        // Fade in
         return FadeTransition(
           opacity: animation,
           child: SlideTransition(position: offsetAnimation, child: child),
@@ -254,12 +237,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // 🚀 --- NEW WIDGET: Identifier Form --- 🚀
   Widget _buildIdentifierForm(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        //SizedBox(height: 12.h),
         SmartIdentifierField(controller: _identifierController),
 
         SizedBox(height: 24.h),
@@ -273,7 +254,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // 🚀 --- NEW WIDGET: Password Form --- 🚀
   Widget _buildPasswordForm(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -324,8 +304,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // 🚀 --- NEW WIDGET: OTP Form --- 🚀
-  // 🚀 --- NEW WIDGET: OTP Form --- 🚀
   Widget _buildOtpForm(ThemeData theme) {
     final defaultPinTheme = PinTheme(
       width: 50.w,
@@ -356,7 +334,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         SizedBox(height: 32.h),
 
-        // 🌟 Redesigned OTP Input
         Pinput(
           length: 6,
           controller: _otpController,
@@ -450,7 +427,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: Stack(
                     children: [
-                      // Subtle background icon
                       Positioned(
                         right: -40.w,
                         bottom: -40.h,
@@ -461,7 +437,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      // --- ✨ Main Header Texts ---
                       Align(
                         alignment: Alignment.bottomLeft,
                         child: Padding(
@@ -500,7 +475,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
 
-            // Form Content
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(16.w),
@@ -508,7 +482,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      // 🚀 --- NEW "Glass" Card --- 🚀
                       ClipRRect(
                         borderRadius: BorderRadius.circular(20.r),
                         child: BackdropFilter(
@@ -527,7 +500,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: 24.h),
 
-                      // "OR" Divider
                       Row(
                         children: [
                           Expanded(child: Divider(color: Colors.grey.shade300)),
@@ -563,7 +535,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       SizedBox(height: 24.h),
 
-                      // Create Account Button
                       if (_showCreateAccount)
                         ElevatedButton(
                           onPressed: () => _showCreateAccountSheet(context),
@@ -603,18 +574,15 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // 🚀 --- NEW: Redesigned Google Button --- 🚀
   Widget _buildGoogleSignInButton(ThemeData theme) {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       transitionBuilder: (child, animation) {
-        // Slide in from the right
         final offsetAnimation = Tween<Offset>(
           begin: const Offset(1.0, 0.0),
           end: Offset.zero,
         ).animate(animation);
 
-        // Fade in
         return FadeTransition(
           opacity: animation,
           child: SlideTransition(position: offsetAnimation, child: child),
@@ -663,7 +631,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // 🚀 --- Show Create Account Bottom Sheet --- 🚀
   void _showCreateAccountSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -678,7 +645,6 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Animated Icon
               TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0.0, end: 1.0),
                 duration: const Duration(milliseconds: 600),
@@ -698,7 +664,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 24.h),
 
-              // Title
               Text(
                 "Create an account to start your learning journey",
                 style: theme.textTheme.bodyLarge?.copyWith(
@@ -710,7 +675,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 32.h),
 
-              // Create Account Button
               StyledButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -722,7 +686,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 12.h),
 
-              // Cancel Button
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: const Text("CANCEL"),

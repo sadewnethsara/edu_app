@@ -45,7 +45,6 @@ class _RepostBottomSheetState extends State<RepostBottomSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Quote Input
           TextField(
             controller: _textController,
             maxLines: 3,
@@ -58,7 +57,6 @@ class _RepostBottomSheetState extends State<RepostBottomSheet> {
 
           SizedBox(height: 12.h),
 
-          // Post Preview
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
@@ -112,7 +110,6 @@ class _RepostBottomSheetState extends State<RepostBottomSheet> {
 
           SizedBox(height: 24.h),
 
-          // Action Row
           Row(
             children: [
               Expanded(

@@ -90,9 +90,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
               title: "Delete Account",
               subtitle: "Permanently remove your account and all data.",
               icon: EvaIcons.trash_2_outline,
-              onTap: () {
-                // TODO: Implement delete account logic
-              },
+              onTap: () {},
             ),
           ],
         ),

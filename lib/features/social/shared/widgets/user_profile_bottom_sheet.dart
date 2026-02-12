@@ -138,7 +138,6 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Avatar & Action Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,7 +204,6 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
           ),
           SizedBox(height: 12.h),
 
-          // Name & Handle
           Text(
             _user!.displayName,
             style: theme.textTheme.headlineSmall?.copyWith(
@@ -227,7 +225,6 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
 
           SizedBox(height: 16.h),
 
-          // Stats
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -256,7 +253,6 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
           Divider(),
           SizedBox(height: 12.h),
 
-          // Achievements Section
           Text(
             'Achievements',
             style: theme.textTheme.titleMedium?.copyWith(

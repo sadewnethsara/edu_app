@@ -43,14 +43,12 @@ class _CommunitiesListScreenState extends State<CommunitiesListScreen> {
       final user = context.read<AuthService>().user;
       final futures = <Future>[];
 
-      // Always fetch recommendations
       futures.add(
         _communityService.getRecommendedCommunities().then((list) {
           _recommendedCommunities = list;
         }),
       );
 
-      // Fetch user communities if logged in
       if (user != null) {
         futures.add(
           _communityService.getUserCommunities(user.uid).then((list) {

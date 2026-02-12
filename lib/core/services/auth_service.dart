@@ -10,7 +10,6 @@ import 'package:math/core/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
-// This enum helps our router decide which screen to show
 enum AuthStatus { uninitialized, authenticated, unauthenticated }
 
 class AuthService with ChangeNotifier {
@@ -31,7 +30,6 @@ class AuthService with ChangeNotifier {
   UserModel? get userModel => _userModel;
   AuthStatus get status => _status;
 
-  // State for phone authentication
   String? _verificationId;
   AuthCredential? _googleCredential; // Store Google credential for linking
 
@@ -76,8 +74,6 @@ class AuthService with ChangeNotifier {
     _userDocSubscription?.cancel();
     super.dispose();
   }
-
-  // --- Profile & Onboarding Helper ---
 
   Future<void> uploadOnboardingData(User user) async {
     try {
@@ -125,7 +121,6 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  // --- Google Sign-In Init Methods ---
   Future<void> _initializeGoogleSignIn() async {
     try {
       await _googleSignIn.initialize(
@@ -144,7 +139,6 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  // --- Auth Checks and Logic ---
   Future<bool> checkEmailExists(String email) async {
     if (email.trim().isEmpty) return false;
     try {
@@ -170,7 +164,6 @@ class AuthService with ChangeNotifier {
   Future<bool> checkPhoneExists(String phoneNumber) async {
     if (phoneNumber.trim().isEmpty) return false;
     try {
-      // Use Cloud Function to check existence securely (bypassing Firestore rules)
       final callable = _functions.httpsCallable('checkPhoneExists');
       final result = await callable.call<Map<String, dynamic>>({
         'phoneNumber': phoneNumber.trim(),
@@ -209,21 +202,17 @@ class AuthService with ChangeNotifier {
     try {
       await _ensureGoogleSignInInitialized();
 
-      // Sign in with Google using authenticate - throws exception if canceled
       final googleUser = await _googleSignIn.authenticate();
 
-      // Get authentication details from the account
       final googleAuth = googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
 
-      // Check if this Google email already exists using Cloud Function (bypasses permission issues)
       final email = googleUser.email;
       final exists = await checkEmailExists(email);
 
       if (exists) {
-        // User exists - sign in
         final userCredential = await _firebaseAuth.signInWithCredential(
           credential,
         );
@@ -234,7 +223,6 @@ class AuthService with ChangeNotifier {
         }
         return null;
       } else {
-        // New Google user - store credential and return special error code
         _googleCredential = credential;
         return "USER_NOT_FOUND";
       }
@@ -243,7 +231,6 @@ class AuthService with ChangeNotifier {
       return e.message;
     } catch (e, s) {
       logger.e('Unexpected Google Sign-In Error', error: e, stackTrace: s);
-      // Check if it was canceled by user
       if (e.toString().contains('canceled') ||
           e.toString().contains('cancelled')) {
         return "Google Sign-In was canceled by the user.";
@@ -252,7 +239,6 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  // Find user by email in Firestore
   Future<DocumentSnapshot?> _findUserByEmail(String email) async {
     try {
       final querySnapshot = await _firestore
@@ -271,7 +257,6 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  // Find user by phone number in Firestore
   Future<DocumentSnapshot?> _findUserByPhone(String phoneNumber) async {
     try {
       final querySnapshot = await _firestore
@@ -290,7 +275,6 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  // Merge two user accounts (from old UID to new UID)
   Future<void> _mergeUserAccounts(String oldUid, String newUid) async {
     try {
       final oldUserDoc = await _firestore.collection('users').doc(oldUid).get();
@@ -300,7 +284,6 @@ class AuthService with ChangeNotifier {
         final oldData = oldUserDoc.data() ?? {};
         final newData = newUserDoc.data() ?? {};
 
-        // Merge data - prefer old user's data for most fields
         final mergedData = {
           ...newData,
           ...oldData,
@@ -309,13 +292,11 @@ class AuthService with ChangeNotifier {
           'mergedAt': FieldValue.serverTimestamp(),
         };
 
-        // Update new user document with merged data
         await _firestore
             .collection('users')
             .doc(newUid)
             .set(mergedData, SetOptions(merge: true));
 
-        // Delete old user document
         await _firestore.collection('users').doc(oldUid).delete();
 
         logger.i('Successfully merged accounts: $oldUid -> $newUid');
@@ -354,9 +335,7 @@ class AuthService with ChangeNotifier {
         'role': 'user',
       });
     } else {
-      // Update existing user, merge phone number if available
       final Map<String, dynamic> updateData = {...userData};
-      // Don't overwrite phone number if it's already set
       final existingData = doc.data();
       if (existingData?['phoneNumber'] != null && user.phoneNumber == null) {
         updateData.remove('phoneNumber');
@@ -364,8 +343,6 @@ class AuthService with ChangeNotifier {
       await userRef.update(updateData);
     }
   }
-
-  // --- Phone OTP Methods ---
 
   Future<void> sendOtpToPhone(BuildContext context, String phoneNumber) async {
     logger.i('Sending OTP to $phoneNumber');
@@ -487,8 +464,6 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  // --- Custom Business Logic ---
-
   Future<void> awardPoints(int pointsToAdd) async {
     final user = _firebaseAuth.currentUser;
     if (user == null) return;
@@ -519,9 +494,6 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  // --- Social Logic (Cloud Function Calls) ---
-
-  // 🚀 FIX 1: followUser
   Future<String?> followUser(String userIdToFollow) async {
     final user = _firebaseAuth.currentUser;
     if (user == null) return "You must be logged in.";
@@ -533,7 +505,6 @@ class AuthService with ChangeNotifier {
       });
 
       if (result.data['success'] == true) {
-        // Send Notification
         await SocialService().sendNotification(
           toUserId: userIdToFollow,
           title: 'New Follower',
@@ -555,7 +526,6 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  // 🚀 FIX 2: unfollowUser
   Future<String?> unfollowUser(String userIdToUnfollow) async {
     final user = _firebaseAuth.currentUser;
     if (user == null) return "You must be logged in.";
@@ -581,7 +551,6 @@ class AuthService with ChangeNotifier {
     String targetUserId,
     bool isCurrentlyLiked,
   ) async {
-    // ... (Your existing likePost logic) ...
     final user = _firebaseAuth.currentUser;
     if (user == null) return "You must be logged in.";
 
@@ -593,7 +562,6 @@ class AuthService with ChangeNotifier {
       });
 
       if (result.data['success'] == true) {
-        // Send Notification if Liking (not unliking)
         if (!isCurrentlyLiked) {
           await SocialService().sendNotification(
             toUserId: targetUserId,
@@ -624,7 +592,6 @@ class AuthService with ChangeNotifier {
     String targetUserId,
     bool isCurrentlyLiked,
   ) async {
-    // ... (Your existing likeReply logic) ...
     final user = _firebaseAuth.currentUser;
     if (user == null) return "You must be logged in.";
 
@@ -637,7 +604,6 @@ class AuthService with ChangeNotifier {
       });
 
       if (result.data['success'] == true) {
-        // Send Notification if Liking
         if (!isCurrentlyLiked) {
           await SocialService().sendNotification(
             toUserId: targetUserId,
@@ -676,7 +642,6 @@ class AuthService with ChangeNotifier {
         smsCode: smsCode.trim(),
       );
 
-      // 1. Sign in with Google first
       final userCredential = await _firebaseAuth.signInWithCredential(
         _googleCredential!,
       );
@@ -686,10 +651,8 @@ class AuthService with ChangeNotifier {
         return 'Failed to sign in with Google.';
       }
 
-      // 2. Link with phone
       await user.linkWithCredential(phoneCredential);
 
-      // 3. Create user document
       await _createOrUpdateUserDocument(user);
 
       _googleCredential = null;
@@ -709,8 +672,6 @@ class AuthService with ChangeNotifier {
       return 'An unexpected error occurred.';
     }
   }
-
-  // --- Sign Out ---
 
   Future<void> signOut() async {
     try {

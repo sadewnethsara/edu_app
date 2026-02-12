@@ -14,13 +14,11 @@ class MediaService {
 
   SettingsService get _settings => SettingsService();
 
-  /// Compress image based on current settings
   Future<File> compressImage(File file) async {
     try {
       final quality = _settings.uploadQuality;
       final originalSize = await file.length();
 
-      // Calculate target: Standard -> 500KB (512000 bytes), High -> 1.2MB (1258291 bytes)
       final targetSize = quality == MediaQuality.standard ? 512000 : 1258291;
 
       if (originalSize <= targetSize) {
@@ -33,12 +31,10 @@ class MediaService {
         '${DateTime.now().millisecondsSinceEpoch}_compressed.jpg',
       );
 
-      // Simple heuristic: If vast difference, reduce quality significantly
       int compressQuality = 90;
       if (originalSize > targetSize * 4) compressQuality = 70;
       if (originalSize > targetSize * 8) compressQuality = 50;
 
-      // Standard: more aggressive
       if (quality == MediaQuality.standard) {
         compressQuality = (compressQuality * 0.8).round();
       }
@@ -52,8 +48,6 @@ class MediaService {
       if (result == null) return file;
       File compressedFile = File(result.path);
 
-      // Recursive check if still too big (one pass only to verify) or loop until target
-      // For simplicity/performance, let's just do one pass with aggressive settings if standard
       if (await compressedFile.length() > targetSize &&
           quality == MediaQuality.standard) {
         var result2 = await FlutterImageCompress.compressAndGetFile(
@@ -76,10 +70,8 @@ class MediaService {
     }
   }
 
-  /// Compress video based on current settings
   Future<File> compressVideo(File file) async {
     try {
-      // Clean up previous cache
       await VideoCompress.deleteAllCache();
 
       final quality = _settings.uploadQuality;
@@ -88,9 +80,7 @@ class MediaService {
                 .MediumQuality // 720p usually, or lower specifically?
           : VideoQuality.DefaultQuality; // High/Default
 
-      // If standard, maybe use Low
       if (quality == MediaQuality.standard) {
-        // Standard: aim for lower size
         videoQuality = VideoQuality.MediumQuality;
       } else {
         videoQuality = VideoQuality.Res1920x1080Quality; // High

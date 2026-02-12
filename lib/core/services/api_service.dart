@@ -3,7 +3,7 @@ import 'package:math/core/models/content_model.dart';
 import 'package:math/core/models/grade_model.dart';
 import 'package:math/core/models/language_model.dart';
 import 'package:math/core/models/lesson_model.dart';
-import 'package:math/core/models/notification_model.dart'; // 🚀 ADDED
+import 'package:math/core/models/notification_model.dart';
 import 'package:math/core/models/post_model.dart';
 import 'package:math/core/models/past_paper_model.dart';
 import 'package:math/core/models/subject_model.dart';
@@ -17,12 +17,10 @@ class ApiService {
   ApiService({FirebaseFirestore? firestore})
     : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  // --- Memory Cache ---
   final Map<String, dynamic> _memoryCache = {};
   final Map<String, DateTime> _cacheTimestamps = {};
   static const Duration _cacheDuration = Duration(minutes: 5); // 5 minute TTL
 
-  // --- Helper: Cache Management ---
   T? _getFromCache<T>(String key) {
     if (_memoryCache.containsKey(key)) {
       final timestamp = _cacheTimestamps[key];
@@ -53,7 +51,6 @@ class ApiService {
     logger.i('🧹 Memory cache cleared');
   }
 
-  // --- Helper: Language Matcher ---
   bool _matchesLanguage(String? itemLanguage, String targetLanguage) {
     if (itemLanguage == null || itemLanguage.isEmpty) {
       return true;
@@ -69,7 +66,6 @@ class ApiService {
         (itemLang == 'si' && targetLang == 'sinhala');
   }
 
-  // --- Content Item Parser Helper (Uses Language Filter) ---
   List<ContentItem> _parseAndFilterContentItems(
     List<dynamic>? items,
     String languageCode,
@@ -85,9 +81,6 @@ class ApiService {
         .toList();
   }
 
-  // -----------------------------------------------------------
-  // 1. CURRICULUM & CONTENT APIs
-  // -----------------------------------------------------------
   Future<List<LanguageModel>> getLanguages() async {
     try {
       final snapshot = await _firestore
@@ -105,7 +98,6 @@ class ApiService {
     }
   }
 
-  // --- Grade APIs ---
   Future<List<GradeModel>> getGrades(String languageCode) async {
     try {
       final snapshot = await _firestore
@@ -136,7 +128,6 @@ class ApiService {
     }
   }
 
-  // --- Subject APIs ---
   Future<List<SubjectModel>> getSubjects(
     String gradeId,
     String languageCode, {
@@ -149,7 +140,6 @@ class ApiService {
     }
 
     try {
-      // ✅ Primary: curricula/{languageCode}/grades/{gradeId}/subjects/
       var snapshot = await _firestore
           .collection('curricula')
           .doc(languageCode)
@@ -159,7 +149,6 @@ class ApiService {
           .orderBy('order')
           .get();
 
-      // 🔁 Fallback: grades/{gradeId}/subjects/
       if (snapshot.docs.isEmpty) {
         snapshot = await _firestore
             .collection('grades')
@@ -192,7 +181,6 @@ class ApiService {
     }
   }
 
-  // --- Lesson APIs ---
   Future<List<LessonModel>> getLessons(
     String gradeId,
     String subjectId,
@@ -210,7 +198,6 @@ class ApiService {
         '📚 Fetching lessons for grade: $gradeId, subject: $subjectId, language: $languageCode',
       );
 
-      // ✅ PRIMARY: Fetch from grades path (where admin API creates lessons)
       var snapshot = await _firestore
           .collection('grades')
           .doc(gradeId)
@@ -224,7 +211,6 @@ class ApiService {
         'Found ${snapshot.docs.length} lessons in grades/$gradeId/subjects/$subjectId/lessons (filtered by language: $languageCode)',
       );
 
-      // 🔁 FALLBACK: Try without language filter if no lessons found
       if (snapshot.docs.isEmpty) {
         logger.w(
           '⚠️ No lessons with language filter, trying without language filter...',
@@ -242,7 +228,6 @@ class ApiService {
         );
       }
 
-      // 🔁 FALLBACK 2: Try curricula path if still empty
       if (snapshot.docs.isEmpty) {
         logger.w(
           '⚠️ No lessons in grades path, trying curricula path fallback...',
@@ -310,7 +295,6 @@ class ApiService {
         );
       }
 
-      // Sort by order if available, otherwise by name
       lessons.sort((a, b) {
         if (a.order != b.order) {
           return a.order.compareTo(b.order);
@@ -331,14 +315,12 @@ class ApiService {
     }
   }
 
-  // 🚀 NEW: searchLessons
   Future<List<LessonModel>> searchLessons(
     String query,
     String languageCode,
   ) async {
     if (query.isEmpty) return [];
     try {
-      // Search across all lessons using Collection Group Query
       final snapshot = await _firestore
           .collectionGroup('lessons')
           .where('name', isGreaterThanOrEqualTo: query)
@@ -363,7 +345,6 @@ class ApiService {
     }
   }
 
-  // --- Subtopic APIs ---
   Future<List<SubtopicModel>> getSubtopics(
     String gradeId,
     String subjectId,
@@ -383,7 +364,6 @@ class ApiService {
         '📚 Fetching subtopics for lesson: $lessonId, language: $languageCode',
       );
 
-      // ✅ PRIMARY: Fetch from grades path (where admin API creates subtopics)
       var snapshot = await _firestore
           .collection('grades')
           .doc(gradeId)
@@ -399,7 +379,6 @@ class ApiService {
         'Found ${snapshot.docs.length} subtopics in grades path (filtered by language: $languageCode)',
       );
 
-      // 🔁 FALLBACK: Try without language filter if no subtopics found
       if (snapshot.docs.isEmpty) {
         logger.w(
           '⚠️ No subtopics with language filter, trying without language filter...',
@@ -419,7 +398,6 @@ class ApiService {
         );
       }
 
-      // 🔁 FALLBACK 2: Try curricula path if still empty
       if (snapshot.docs.isEmpty) {
         logger.w(
           '⚠️ No subtopics in grades path, trying curricula path fallback...',
@@ -490,7 +468,6 @@ class ApiService {
         );
       }
 
-      // Sort by order if available, otherwise by name
       subtopics.sort((a, b) {
         if (a.order != b.order) {
           return a.order.compareTo(b.order);
@@ -511,9 +488,6 @@ class ApiService {
     }
   }
 
-  // --- Lesson Content APIs ---
-
-  /// Fetch lesson content (videos, notes, PDFs, resources) for a specific lesson
   Future<ContentCollection?> getLessonContent(
     String gradeId,
     String subjectId,
@@ -581,7 +555,6 @@ class ApiService {
     }
   }
 
-  /// Fetch subtopic content (videos, notes, PDFs, resources) for a specific subtopic
   Future<ContentCollection?> getSubtopicContent(
     String gradeId,
     String subjectId,
@@ -652,10 +625,6 @@ class ApiService {
       return null;
     }
   }
-
-  // -----------------------------------------------------------
-  // 2. PAST PAPER APIs
-  // -----------------------------------------------------------
 
   Future<List<PastPaperModel>> getPastPapers(
     String gradeId,
@@ -729,10 +698,6 @@ class ApiService {
     }
   }
 
-  // -----------------------------------------------------------
-  // 4. COMMUNITY APIs
-  // -----------------------------------------------------------
-
   Future<List<PostModel>> getCommunityPosts(
     String communityId, {
     int limit = 20,
@@ -759,7 +724,6 @@ class ApiService {
     }
   }
 
-  /// Get a real-time stream of community posts
   Stream<List<PostModel>> getCommunityPostsStream(String communityId) {
     return _firestore
         .collection('posts')
@@ -774,13 +738,7 @@ class ApiService {
         });
   }
 
-  Future<void> debugPastPapersCollection() async {
-    // This is utility code and remains as a debug helper
-  }
-
-  // -----------------------------------------------------------
-  // 3. SOCIAL & LEADERBOARD APIs
-  // -----------------------------------------------------------
+  Future<void> debugPastPapersCollection() async {}
 
   Future<List<UserModel>> getLeaderboard() async {
     try {
@@ -858,19 +816,16 @@ class ApiService {
     }
   }
 
-  // 🚀 FIX 1: getFollowingList
   Future<List<UserModel>> getFollowingList(String userId) async {
     final userIds = await _getUserListIds(userId, 'following');
     return await getUsersFromIdList(userIds);
   }
 
-  // 🚀 FIX 2: getFollowersList
   Future<List<UserModel>> getFollowersList(String userId) async {
     final userIds = await _getUserListIds(userId, 'followers');
     return await getUsersFromIdList(userIds);
   }
 
-  // 🚀 NEW: getNotifications
   Future<List<NotificationModel>> getNotifications(String userId) async {
     try {
       final snapshot = await _firestore
@@ -890,7 +845,6 @@ class ApiService {
     }
   }
 
-  // 🚀 NEW: markNotificationAsRead
   Future<void> markNotificationAsRead(
     String userId,
     String notificationId,
@@ -907,7 +861,6 @@ class ApiService {
     }
   }
 
-  // 🚀 NEW: searchUsers
   Future<List<UserModel>> searchUsers(String query) async {
     if (query.isEmpty) return [];
     try {
@@ -927,7 +880,6 @@ class ApiService {
     }
   }
 
-  // 🚀 NEW: getFeedPosts (Filtered Global Feed)
   Future<List<PostModel>> getFeedPosts({
     String? gradeId,
     String? medium,
@@ -938,7 +890,6 @@ class ApiService {
           .collection('posts')
           .where('status', isEqualTo: PostStatus.approved.name);
 
-      // Apply Filters if provided
       if (gradeId != null) {
         query = query.where('gradeId', isEqualTo: gradeId);
       }
@@ -946,7 +897,6 @@ class ApiService {
         query = query.where('medium', isEqualTo: medium);
       }
 
-      // Order by creation time
       query = query.orderBy('createdAt', descending: true).limit(limit);
 
       final snapshot = await query.get();
@@ -958,7 +908,6 @@ class ApiService {
     }
   }
 
-  /// Get a real-time stream of feed posts
   Stream<List<PostModel>> getFeedPostsStream({
     String? gradeId,
     String? medium,
@@ -986,7 +935,6 @@ class ApiService {
         });
   }
 
-  // 🚀 NEW: followUser
   Future<void> followUser(String currentUserId, String targetUserId) async {
     try {
       final batch = _firestore.batch();
@@ -994,23 +942,19 @@ class ApiService {
       final currentUserRef = _firestore.collection('users').doc(currentUserId);
       final targetUserRef = _firestore.collection('users').doc(targetUserId);
 
-      // Add to following
       batch.set(currentUserRef.collection('following').doc(targetUserId), {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      // Add to followers
       batch.set(targetUserRef.collection('followers').doc(currentUserId), {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      // Update counts (optional, but good for performance)
       batch.update(currentUserRef, {'followingCount': FieldValue.increment(1)});
       batch.update(targetUserRef, {'followersCount': FieldValue.increment(1)});
 
       await batch.commit();
 
-      // Send notification
       await _firestore
           .collection('users')
           .doc(targetUserId)
@@ -1029,7 +973,6 @@ class ApiService {
     }
   }
 
-  // 🚀 NEW: unfollowUser
   Future<void> unfollowUser(String currentUserId, String targetUserId) async {
     try {
       final batch = _firestore.batch();
@@ -1037,13 +980,10 @@ class ApiService {
       final currentUserRef = _firestore.collection('users').doc(currentUserId);
       final targetUserRef = _firestore.collection('users').doc(targetUserId);
 
-      // Remove from following
       batch.delete(currentUserRef.collection('following').doc(targetUserId));
 
-      // Remove from followers
       batch.delete(targetUserRef.collection('followers').doc(currentUserId));
 
-      // Update counts
       batch.update(currentUserRef, {
         'followingCount': FieldValue.increment(-1),
       });
@@ -1056,7 +996,6 @@ class ApiService {
     }
   }
 
-  // 🚀 NEW: Search Posts
   Future<List<PostModel>> searchPosts({
     required String query,
     String? gradeId,
@@ -1070,7 +1009,6 @@ class ApiService {
     try {
       Query queryRef = _firestore.collection('posts');
 
-      // Apply primary filters
       if (gradeId != null) {
         queryRef = queryRef.where('gradeId', isEqualTo: gradeId);
       }
@@ -1081,7 +1019,6 @@ class ApiService {
         queryRef = queryRef.where('subjectId', isEqualTo: subjectId);
       }
 
-      // Sort logic (Firestore requires indexes for these)
       if (sortBy == 'popular') {
         queryRef = queryRef.orderBy('likeCount', descending: true);
       } else if (sortBy == 'helpful') {
@@ -1092,7 +1029,6 @@ class ApiService {
 
       final snapshot = await queryRef.limit(limit * 2).get();
 
-      // Filter by text search and content type in memory
       var results = snapshot.docs
           .map((doc) => PostModel.fromSnapshot(doc))
           .where((post) {
@@ -1134,7 +1070,6 @@ class ApiService {
     }
   }
 
-  // 🚀 NEW: Get Trending Posts (based on engagement score)
   Future<List<PostModel>> getTrendingPosts({
     String? gradeId,
     String? medium,
@@ -1158,7 +1093,6 @@ class ApiService {
           .limit(limit * 2)
           .get(); // Get more to calculate score
 
-      // Calculate engagement score: (likes * 2) + replies + (shares * 3) + views/10
       final posts = snapshot.docs
           .map((doc) => PostModel.fromSnapshot(doc))
           .toList();
@@ -1183,7 +1117,6 @@ class ApiService {
     }
   }
 
-  // 🚀 NEW: Get Posts by Subject
   Future<List<PostModel>> getPostsBySubject({
     required String subjectId,
     String? gradeId,
@@ -1213,7 +1146,6 @@ class ApiService {
     }
   }
 
-  /// Get a real-time stream of posts by subject
   Stream<List<PostModel>> getPostsBySubjectStream({
     required String subjectId,
     String? gradeId,
@@ -1324,7 +1256,6 @@ class ApiService {
         });
   }
 
-  // 🚀 NEW: Mark Answer as Helpful
   Future<void> markAnswerAsHelpful({
     required String postId,
     required String replyId,
@@ -1339,37 +1270,31 @@ class ApiService {
           .doc(replyId);
 
       if (isHelpful) {
-        // Check if post author is marking (official helpful)
         final postDoc = await _firestore.collection('posts').doc(postId).get();
         final post = PostModel.fromSnapshot(postDoc);
         final isAuthor = post.authorId == userId;
 
         if (isAuthor) {
-          // Author marking - set as official helpful answer
           await _firestore.collection('posts').doc(postId).update({
             'helpfulAnswerId': replyId,
             'helpfulAnswerCount': FieldValue.increment(1),
           });
         }
 
-        // Add to helpful collection
         await replyRef.collection('helpful').doc(userId).set({
           'timestamp': FieldValue.serverTimestamp(),
         });
 
-        // Increment helpful count
         await replyRef.update({
           'helpfulCount': FieldValue.increment(1),
           if (isAuthor) 'isMarkedHelpful': true,
         });
       } else {
-        // Remove helpful mark
         final postDoc = await _firestore.collection('posts').doc(postId).get();
         final post = PostModel.fromSnapshot(postDoc);
         final isAuthor = post.authorId == userId;
 
         if (isAuthor) {
-          // Author removing - clear official helpful answer
           await _firestore.collection('posts').doc(postId).update({
             'helpfulAnswerId': null,
             'helpfulAnswerCount': FieldValue.increment(-1),

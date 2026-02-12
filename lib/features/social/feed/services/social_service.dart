@@ -9,12 +9,10 @@ class SocialService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  // Singleton pattern (optional but good for services)
   static final SocialService _instance = SocialService._internal();
   factory SocialService() => _instance;
   SocialService._internal();
 
-  /// Update user settings in Firestore
   Future<void> updateUserSettings(
     String userId,
     Map<String, dynamic> settings,
@@ -27,7 +25,6 @@ class SocialService {
     }
   }
 
-  /// Mute a user
   Future<void> muteUser(String myUid, String targetUid) async {
     try {
       await _firestore
@@ -36,7 +33,6 @@ class SocialService {
           .collection('muted')
           .doc(targetUid)
           .set({'timestamp': FieldValue.serverTimestamp()});
-      // Also update the list in the user document for easier filtering in some cases (optional)
       await _firestore.collection('users').doc(myUid).update({
         'mutedUsers': FieldValue.arrayUnion([targetUid]),
       });
@@ -46,7 +42,6 @@ class SocialService {
     }
   }
 
-  /// Unmute a user
   Future<void> unmuteUser(String myUid, String targetUid) async {
     try {
       await _firestore
@@ -64,7 +59,6 @@ class SocialService {
     }
   }
 
-  /// Block a user
   Future<void> blockUser(String myUid, String targetUid) async {
     try {
       await _firestore
@@ -76,9 +70,7 @@ class SocialService {
       await _firestore.collection('users').doc(myUid).update({
         'blockedUsers': FieldValue.arrayUnion([targetUid]),
       });
-      // Automatically unfollow when blocking
       await unfollowUser(myUid, targetUid);
-      // Also make sure the other user unfollows me
       await unfollowUser(targetUid, myUid);
     } catch (e) {
       logger.e('Error blocking user', error: e);
@@ -86,7 +78,6 @@ class SocialService {
     }
   }
 
-  /// Unblock a user
   Future<void> unblockUser(String myUid, String targetUid) async {
     try {
       await _firestore
@@ -104,7 +95,6 @@ class SocialService {
     }
   }
 
-  /// Check if a user is muted
   Future<bool> isMuted(String myUid, String targetUid) async {
     try {
       final doc = await _firestore
@@ -119,7 +109,6 @@ class SocialService {
     }
   }
 
-  /// Check if a user is blocked
   Future<bool> isBlocked(String myUid, String targetUid) async {
     try {
       final doc = await _firestore
@@ -134,7 +123,6 @@ class SocialService {
     }
   }
 
-  /// Check if the current user is following the target user
   Future<bool> checkIsFollowing(String myUid, String targetUid) async {
     try {
       final doc = await _firestore
@@ -150,7 +138,6 @@ class SocialService {
     }
   }
 
-  /// Follow a user
   Future<void> followUser(String myUid, String targetUid) async {
     try {
       final myRef = _firestore.collection('users').doc(myUid);
@@ -163,20 +150,16 @@ class SocialService {
         final followingDoc = await transaction.get(myFollowingRef);
         if (followingDoc.exists) return; // Already following
 
-        // 1. Add to my 'following' collection
         transaction.set(myFollowingRef, {
           'timestamp': FieldValue.serverTimestamp(),
         });
 
-        // 2. Add to target's 'followers' collection
         transaction.set(targetFollowersRef, {
           'timestamp': FieldValue.serverTimestamp(),
         });
 
-        // 3. Increment my 'followingCount'
         transaction.update(myRef, {'followingCount': FieldValue.increment(1)});
 
-        // 4. Increment target's 'followersCount'
         transaction.update(targetRef, {
           'followersCount': FieldValue.increment(1),
         });
@@ -187,7 +170,6 @@ class SocialService {
     }
   }
 
-  /// Unfollow a user
   Future<void> unfollowUser(String myUid, String targetUid) async {
     try {
       final myRef = _firestore.collection('users').doc(myUid);
@@ -200,16 +182,12 @@ class SocialService {
         final followingDoc = await transaction.get(myFollowingRef);
         if (!followingDoc.exists) return; // Not following
 
-        // 1. Remove from my 'following' collection
         transaction.delete(myFollowingRef);
 
-        // 2. Remove from target's 'followers' collection
         transaction.delete(targetFollowersRef);
 
-        // 3. Decrement my 'followingCount'
         transaction.update(myRef, {'followingCount': FieldValue.increment(-1)});
 
-        // 4. Decrement target's 'followersCount'
         transaction.update(targetRef, {
           'followersCount': FieldValue.increment(-1),
         });
@@ -220,9 +198,6 @@ class SocialService {
     }
   }
 
-  /// Get list of followers for a user
-  /// Returns a stream of UserModels (requires fetching user details for each ID)
-  /// For simplicity/performance in bottom sheet, we might paginate or just fetch IDs then details.
   Stream<QuerySnapshot> getFollowersStream(String userId) {
     return _firestore
         .collection('users')
@@ -254,13 +229,9 @@ class SocialService {
     }
   }
 
-  /// Get multiple user profiles by their IDs
   Future<List<UserModel>> getUsers(List<String> userIds) async {
     if (userIds.isEmpty) return [];
     try {
-      // Firestore 'in' query is limited to 10-30 items depending on version.
-      // For safety and large lists, we should batch or fetch individually (or use a better approach).
-      // Here we fetch in chunks of 10 for safety.
       List<UserModel> users = [];
       for (var i = 0; i < userIds.length; i += 10) {
         final chunk = userIds.sublist(
@@ -282,7 +253,6 @@ class SocialService {
     }
   }
 
-  /// Get multiple posts by their IDs
   Future<List<PostModel>> getPosts(List<String> postIds) async {
     if (postIds.isEmpty) return [];
     try {
@@ -296,7 +266,6 @@ class SocialService {
             .collection('posts')
             .where(FieldPath.documentId, whereIn: chunk)
             .get();
-        // Maintain the order of postIds passed in
         final fetchedPosts = snapshot.docs
             .map((doc) => PostModel.fromSnapshot(doc))
             .toList();
@@ -304,9 +273,7 @@ class SocialService {
           try {
             final post = fetchedPosts.firstWhere((p) => p.postId == id);
             posts.add(post);
-          } catch (_) {
-            // Post might have been deleted
-          }
+          } catch (_) {}
         }
       }
       return posts;
@@ -316,9 +283,6 @@ class SocialService {
     }
   }
 
-  // --- Notifications ---
-
-  /// Send a notification to a specific user
   Future<void> sendNotification({
     required String toUserId,
     required String title,
@@ -352,7 +316,6 @@ class SocialService {
     }
   }
 
-  /// Get a stream of unread notification count
   Stream<int> unreadNotificationsCountStream(String userId) {
     return _firestore
         .collection('users')
@@ -363,7 +326,6 @@ class SocialService {
         .map((snapshot) => snapshot.docs.length);
   }
 
-  /// Mark all notifications as read
   Future<void> markAllAsRead(String userId) async {
     try {
       final snapshot = await _firestore
@@ -385,7 +347,6 @@ class SocialService {
     }
   }
 
-  // --- Storage Methods ---
   Future<String?> uploadReplyImage(File imageFile, String userId) async {
     try {
       logger.i('Uploading reply image for user: $userId');
@@ -403,20 +364,15 @@ class SocialService {
     }
   }
 
-  // --- Post Interactions ---
-
-  /// Delete a post
   Future<void> deletePost(String postId) async {
     try {
       await _firestore.collection('posts').doc(postId).delete();
-      // Note: You should trigger a Cloud Function to clean up comments, storage, etc.
     } catch (e) {
       logger.e('Error deleting post', error: e);
       rethrow;
     }
   }
 
-  /// Hide a post for the current user
   Future<void> hidePost(String postId, String userId) async {
     try {
       await _firestore
@@ -431,7 +387,6 @@ class SocialService {
     }
   }
 
-  /// Report a post
   Future<void> reportPost(
     String postId,
     String reason,
@@ -454,18 +409,14 @@ class SocialService {
     }
   }
 
-  /// Increment view count (call this when post details are opened or visible)
   Future<void> incrementViewCount(String postId) async {
     try {
       await _firestore.collection('posts').doc(postId).update({
         'viewCount': FieldValue.increment(1),
       });
-    } catch (e) {
-      // Fail silently for view counts to avoid spamming logs/UI
-    }
+    } catch (e) {}
   }
 
-  /// Increment share count
   Future<void> incrementShareCount(String postId) async {
     try {
       await _firestore.collection('posts').doc(postId).update({
@@ -487,7 +438,6 @@ class SocialService {
     try {
       final firestore = FirebaseFirestore.instance;
 
-      // 1. Check Ban Status
       final userDoc = await firestore.collection('users').doc(userId).get();
       final userData = userDoc.data();
       final bool isBanned = userData?['isBanned'] as bool? ?? false;
@@ -510,7 +460,6 @@ class SocialService {
         sourcePost = PostModel.fromSnapshot(doc);
       }
 
-      // Handle recursive reposts (always point to the root original)
       String targetPostId = sourcePost.postId;
       PostModel targetPost = sourcePost;
 
@@ -526,7 +475,6 @@ class SocialService {
         targetPost = sourcePost.originalPost!;
       }
 
-      // 2. Resolve User (Use passed data or fetch)
       String authorName = userName ?? 'Unknown';
       String? authorPhoto = userPhotoUrl;
 
@@ -545,23 +493,19 @@ class SocialService {
         authorPhotoUrl: authorPhoto,
         text: text ?? '',
         createdAt: Timestamp.now(),
-        // Repost specific
         originalPostId: targetPostId,
         originalPost: targetPost,
       );
 
       await firestore.runTransaction((transaction) async {
-        // Increment global re-share count on result
         final originalRef = firestore.collection('posts').doc(targetPostId);
         transaction.update(originalRef, {
           'reShareCount': FieldValue.increment(1),
         });
 
-        // Create the repost
         transaction.set(newPostRef, finalPost.toJson());
       });
 
-      // Send Notification to Original Author
       await sendNotification(
         toUserId: targetPost.authorId,
         title: 'New Repost',
@@ -579,9 +523,6 @@ class SocialService {
     }
   }
 
-  // --- Tag Methods ---
-
-  /// Get posts by a specific tag
   Stream<QuerySnapshot> getPostsByTag(String tag) {
     return _firestore
         .collection('posts')
@@ -591,7 +532,6 @@ class SocialService {
         .snapshots();
   }
 
-  /// Get posts by category
   Stream<QuerySnapshot> getPostsByCategory(PostCategory category) {
     return _firestore
         .collection('posts')
@@ -601,7 +541,6 @@ class SocialService {
         .snapshots();
   }
 
-  /// Get posts by subject
   Stream<QuerySnapshot> getPostsBySubject(String subject) {
     return _firestore
         .collection('posts')
@@ -611,7 +550,6 @@ class SocialService {
         .snapshots();
   }
 
-  /// Search for tags starting with a query
   Future<List<Map<String, dynamic>>> searchTags(String query) async {
     if (query.isEmpty) return getPopularTags();
 
@@ -626,7 +564,6 @@ class SocialService {
     return snapshot.docs.map((doc) => {'tag': doc.id, ...doc.data()}).toList();
   }
 
-  /// Get popular tags
   Future<List<Map<String, dynamic>>> getPopularTags() async {
     final snapshot = await _firestore
         .collection('tags')
@@ -637,7 +574,6 @@ class SocialService {
     return snapshot.docs.map((doc) => {'tag': doc.id, ...doc.data()}).toList();
   }
 
-  /// Update the use count of a tag (increment or decrement)
   Future<void> updateTagCount(String tag, int increment) async {
     final tagRef = _firestore.collection('tags').doc(tag.toLowerCase());
     await _firestore.runTransaction((transaction) async {
@@ -658,9 +594,6 @@ class SocialService {
     });
   }
 
-  // --- Favorite Methods ---
-
-  /// Toggle favorite status of a post
   Future<void> toggleFavorite(String userId, String postId) async {
     try {
       final favRef = _firestore
@@ -684,7 +617,6 @@ class SocialService {
     }
   }
 
-  /// Check if a post is favorited by a user
   Future<bool> isFavorited(String userId, String postId) async {
     try {
       final doc = await _firestore
@@ -699,7 +631,6 @@ class SocialService {
     }
   }
 
-  /// Get stream of favorite post IDs for a user
   Stream<List<String>> getFavoritePostIdsStream(String userId) {
     return _firestore
         .collection('users')

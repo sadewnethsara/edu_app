@@ -25,7 +25,6 @@ class _SmartIdentifierFieldState extends State<SmartIdentifierField> {
   @override
   void initState() {
     super.initState();
-    // Listen to controller changes
     widget.controller.addListener(_handleControllerChange);
   }
 
@@ -73,7 +72,6 @@ class _SmartIdentifierFieldState extends State<SmartIdentifierField> {
         widget.onModeChanged?.call(true);
       }
 
-      // Phone formatting after 3 digits only
       if (_isPhoneMode == true && value.length >= 3) {
         String formatted = _formatPhone(value);
         if (formatted != value) {
@@ -93,14 +91,12 @@ class _SmartIdentifierFieldState extends State<SmartIdentifierField> {
   String _formatPhone(String value) {
     String cleaned = value.replaceAll(RegExp(r'\s+'), '');
 
-    // Add +94 only after first 3 numbers typed
     if (cleaned.startsWith('0')) {
       cleaned = '+94 ${cleaned.substring(1)}';
     } else if (!cleaned.startsWith('+94') && cleaned.length >= 3) {
       cleaned = '+94 $cleaned';
     }
 
-    // Add spaces for readability: +94 77 1234567
     cleaned = cleaned.replaceFirstMapped(
       RegExp(r'(\+94)(\d{2})(\d+)'),
       (m) => '${m[1]} ${m[2]} ${m[3]}',

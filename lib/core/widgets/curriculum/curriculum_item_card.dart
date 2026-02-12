@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 enum CurriculumItemType { subject, lesson, subtopic }
 
-/// Generic card for curriculum items (subjects, lessons, subtopics)
 class CurriculumItemCard extends StatelessWidget {
   final String name;
   final String description;
@@ -76,7 +75,6 @@ class CurriculumItemCard extends StatelessWidget {
       ];
       return colors[order % colors.length];
     } else {
-      // Subtopic
       final colors = [
         const Color(0xFF8B5CF6), // Purple
         const Color(0xFFEC4899), // Pink
@@ -100,7 +98,6 @@ class CurriculumItemCard extends StatelessWidget {
         child: Icon(_getIcon(), color: color, size: 28.sp),
       );
     } else {
-      // Lessons and subtopics use number circle
       return Container(
         width: 50.w,
         height: 50.w,

@@ -108,7 +108,6 @@ class _HelpFeedbackScreenState extends State<HelpFeedbackScreen> {
               ),
               SizedBox(height: 24.h),
 
-              // Feedback Type Selector
               DropdownButtonFormField<FeedbackType>(
                 value: _selectedType,
                 decoration: InputDecoration(

@@ -25,14 +25,12 @@ class _OfflineBannerState extends State<OfflineBanner> {
   void didUpdateWidget(covariant OfflineBanner oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Handle offline -> online transition
     if (widget.justCameOnline && !oldWidget.justCameOnline) {
       _offlineTimer?.cancel();
       setState(() {
         _showOfflineBanner = false;
         _showOnlineBanner = true;
       });
-      // Hide green banner after 4 seconds
       Timer(const Duration(seconds: 4), () {
         if (mounted) {
           setState(() {
@@ -40,14 +38,11 @@ class _OfflineBannerState extends State<OfflineBanner> {
           });
         }
       });
-    }
-    // Handle online -> offline transition
-    else if (!widget.isOnline && oldWidget.isOnline) {
+    } else if (!widget.isOnline && oldWidget.isOnline) {
       setState(() {
         _showOfflineBanner = true;
         _showOnlineBanner = false;
       });
-      // Auto-hide red banner after 5 seconds
       _offlineTimer?.cancel();
       _offlineTimer = Timer(const Duration(seconds: 5), () {
         if (mounted) {
@@ -67,11 +62,6 @@ class _OfflineBannerState extends State<OfflineBanner> {
 
   @override
   Widget build(BuildContext context) {
-    // This widget will be one of three things:
-    // 1. A red "Offline" banner (if offline and just went offline)
-    // 2. A green "Back Online" banner (if just came online)
-    // 3. Nothing (if online or if offline timer expired)
-
     Widget banner;
     bool show = false;
 
@@ -98,11 +88,9 @@ class _OfflineBannerState extends State<OfflineBanner> {
       show = false;
     }
 
-    // This positions the banner at the top, just below the status bar
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 400),
       curve: Curves.easeInOutCubic,
-      // Animate from -100.h (off-screen) to the top padding (status bar) + 10.h
       top: show ? MediaQuery.of(context).padding.top + 10.h : -100.h,
       left: 16.w,
       right: 16.w,

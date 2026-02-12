@@ -34,13 +34,11 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
     _currentIndex = widget.initialIndex;
     _pageController = PageController(initialPage: widget.initialIndex);
 
-    // Hide Status Bar and Navigation Bar
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
 
   @override
   void dispose() {
-    // Restore System UI
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _pageController.dispose();
     super.dispose();
@@ -66,13 +64,11 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Main Content
             PageView.builder(
               controller: _pageController,
               onPageChanged: (index) => setState(() => _currentIndex = index),
               itemCount: totalCount,
               itemBuilder: (context, index) {
-                // ... Video Handling ...
                 if (hasVideo && index == 0) {
                   return Center(
                     child: SocialVideoPlayer(
@@ -82,7 +78,6 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
                   );
                 }
 
-                // ... Image Handling ...
                 final imageIndex = hasVideo ? index - 1 : index;
                 final imageProvider = widget.imageUrls != null
                     ? CachedNetworkImageProvider(widget.imageUrls![imageIndex])
@@ -111,7 +106,6 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
               },
             ),
 
-            // Top Actions (Close)
             Positioned(
               top: 10,
               left: 10,
@@ -120,7 +114,6 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Close Button
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: Container(
@@ -141,7 +134,6 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
               ),
             ),
 
-            // Bottom Indicator
             if (totalCount > 1)
               Positioned(
                 bottom: 40,

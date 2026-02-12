@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_auth/firebase_auth.dart'; // Removed
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -49,7 +48,6 @@ class _LessonsScreenState extends State<LessonsScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Listen for language changes
     final currentLanguage = context
         .watch<LanguageService>()
         .locale
@@ -66,9 +64,6 @@ class _LessonsScreenState extends State<LessonsScreen> {
         '🔍 LessonsScreen: Fetching for grade=${widget.gradeId}, subject=${widget.subjectId}, language=$_selectedLanguage',
       );
 
-      // Define futures for parallel execution
-
-      // 1. Grade Name Future
       final gradeNameFuture = FirebaseFirestore.instance
           .collection('curricula')
           .doc(_selectedLanguage)
@@ -76,7 +71,6 @@ class _LessonsScreenState extends State<LessonsScreen> {
           .doc(widget.gradeId)
           .get();
 
-      // 2. Subject Name Future (with fallback logic)
       final subjectNameFuture = () async {
         DocumentSnapshot doc = await FirebaseFirestore.instance
             .collection('grades')
@@ -98,7 +92,6 @@ class _LessonsScreenState extends State<LessonsScreen> {
         return doc;
       }();
 
-      // 3. Lessons List Future
       final lessonsFuture = _apiService.getLessons(
         widget.gradeId,
         widget.subjectId,
@@ -106,7 +99,6 @@ class _LessonsScreenState extends State<LessonsScreen> {
         forceRefresh: forceRefresh,
       );
 
-      // Execute all in parallel
       final results = await Future.wait([
         gradeNameFuture,
         subjectNameFuture,
@@ -119,7 +111,6 @@ class _LessonsScreenState extends State<LessonsScreen> {
       final subjectDoc = results[1] as DocumentSnapshot;
       final lessons = results[2] as List<LessonModel>;
 
-      // Process Grade Name
       if (gradeDoc.exists) {
         _gradeName = gradeDoc.data() is Map
             ? ((gradeDoc.data() as Map<String, dynamic>)['name'] ?? 'Grade')
@@ -129,7 +120,6 @@ class _LessonsScreenState extends State<LessonsScreen> {
             'Grade ${widget.gradeId.replaceAll(RegExp(r'[^0-9]'), '')}';
       }
 
-      // Process Subject Name
       if (subjectDoc.exists) {
         final data = subjectDoc.data() as Map<String, dynamic>?;
         _subjectName = data?['name'] ?? 'Subject';
@@ -200,7 +190,6 @@ class _LessonsScreenState extends State<LessonsScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      // 🚀 Apply SafeArea for edge-to-edge
       body: SafeArea(
         top: false,
         bottom: true,
@@ -235,7 +224,6 @@ class _LessonsScreenState extends State<LessonsScreen> {
                 },
               ),
 
-              // Search Bar
               SliverToBoxAdapter(
                 child: _isLoading
                     ? const SearchBarShimmer()
@@ -247,7 +235,6 @@ class _LessonsScreenState extends State<LessonsScreen> {
                       ),
               ),
 
-              // Content
               _isLoading
                   ? const ContentListShimmer(itemHeight: 100)
                   : _filteredLessons.isEmpty

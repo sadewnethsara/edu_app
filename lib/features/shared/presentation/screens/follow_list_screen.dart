@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 
-// Enum to define what list to show
 enum FollowListType { followers, following }
 
 class FollowListScreen extends StatefulWidget {
@@ -100,7 +99,6 @@ class _FollowListScreenState extends State<FollowListScreen> {
                     final user = _users[index];
                     return _UserTile(
                       user: user,
-                      // Hide follow button if it's the current user
                       isCurrentUser: user.uid == _currentUserId,
                     );
                   },
@@ -157,7 +155,6 @@ class _FollowListScreenState extends State<FollowListScreen> {
   }
 }
 
-/// A reusable tile for displaying a user in a list
 class _UserTile extends StatefulWidget {
   final UserModel user;
   final bool isCurrentUser;
@@ -241,7 +238,6 @@ class _UserTileState extends State<_UserTile> {
     return ListTile(
       leading: GestureDetector(
         onTap: () {
-          // Navigate to this user's profile
           if (!widget.isCurrentUser) {
             context.push('${AppRouter.profilePath}?id=${widget.user.uid}');
           } else {

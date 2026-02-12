@@ -21,18 +21,14 @@ class GenderPage extends StatefulWidget {
 class _GenderPageState extends State<GenderPage> {
   String? _gender;
 
-  // 🚀 --- UPDATED INITSTATE --- 🚀
   @override
   void initState() {
     super.initState();
-    // Pre-fill the selection
     _gender = widget.initialGender;
   }
-  // 🚀 --- END OF UPDATE --- 🚀
 
   @override
   Widget build(BuildContext context) {
-    // Get theme properties
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -44,7 +40,6 @@ class _GenderPageState extends State<GenderPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. Icon and Heading
           Center(
             child: AnimatedEmoji(
               AnimatedEmojis.anatomicalHeart,
@@ -80,7 +75,6 @@ class _GenderPageState extends State<GenderPage> {
           ],
           SizedBox(height: 40.h),
 
-          // --- Gender Selection Cards ---
           Row(
             children: [
               Expanded(
@@ -110,7 +104,6 @@ class _GenderPageState extends State<GenderPage> {
     );
   }
 
-  // --- Gender Card Widget (Duolingo Style Selection, Theme-Aware) ---
   Widget _buildGenderCard(BuildContext context, String label, IconData icon) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -124,7 +117,6 @@ class _GenderPageState extends State<GenderPage> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        // Use a fixed height to ensure all cards are identical in size
         height: 100.h,
         padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 12.h),
         decoration: BoxDecoration(
@@ -159,7 +151,6 @@ class _GenderPageState extends State<GenderPage> {
               size: 28.sp,
             ),
             SizedBox(height: 8.h),
-            // Flexibly scale text to fit the card
             Flexible(
               child: FittedBox(
                 fit: BoxFit.scaleDown,

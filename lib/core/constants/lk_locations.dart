@@ -1,5 +1,4 @@
 class SriLankaLocationData {
-  // All 9 provinces of Sri Lanka
   List<String> getProvinces() => [
     'Central',
     'Eastern', // newly added
@@ -12,7 +11,6 @@ class SriLankaLocationData {
     'Western',
   ];
 
-  // Returns all districts within the given province
   List<String> getDistricts(String province) {
     if (province == 'Central') {
       return ['Kandy', 'Matale', 'Nuwara Eliya'];
@@ -44,10 +42,8 @@ class SriLankaLocationData {
     return [];
   }
 
-  // Returns major towns/localities (cities or divisional centres) for a district
   List<String> getCities(String province, String district) {
     switch (district) {
-      // Central Province
       case 'Kandy':
         return ['Kandy City', 'Peradeniya', 'Digana', 'Gampola', 'Katugastota'];
       case 'Matale':
@@ -61,7 +57,6 @@ class SriLankaLocationData {
           'Kothmale',
         ];
 
-      // Western Province
       case 'Colombo':
         return [
           'Colombo 01',
@@ -82,7 +77,6 @@ class SriLankaLocationData {
           'Bandaragama',
         ];
 
-      // Southern Province
       case 'Galle':
         return [
           'Galle City',
@@ -108,7 +102,6 @@ class SriLankaLocationData {
           'Ambalantota',
         ];
 
-      // Northern Province
       case 'Jaffna':
         return [
           'Jaffna City',
@@ -137,7 +130,6 @@ class SriLankaLocationData {
           'Vengalacheddikulam',
         ];
 
-      // Eastern Province
       case 'Ampara':
         return [
           'Ampara Town',
@@ -170,7 +162,6 @@ class SriLankaLocationData {
           'Thambalagamuwa',
         ];
 
-      // North Central Province
       case 'Anuradhapura':
         return [
           'Anuradhapura City',
@@ -190,7 +181,6 @@ class SriLankaLocationData {
           'Lankapura',
         ];
 
-      // North Western Province
       case 'Kurunegala':
         return [
           'Kurunegala Town',
@@ -209,7 +199,6 @@ class SriLankaLocationData {
           'Karuwalagaswewa',
         ];
 
-      // Sabaragamuwa Province
       case 'Kegalle':
         return [
           'Kegalle Town',
@@ -227,7 +216,6 @@ class SriLankaLocationData {
           'Pelmadulla',
         ];
 
-      // Uva Province
       case 'Badulla':
         return [
           'Badulla Town',

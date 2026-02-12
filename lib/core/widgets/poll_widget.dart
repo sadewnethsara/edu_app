@@ -65,7 +65,6 @@ class _PollWidgetState extends State<PollWidget>
         _currentVoteCounts = List.from(widget.pollData.voteCounts);
         _currentTotalVotes = widget.pollData.totalVotes;
       });
-      // Refresh user's own vote status to sync across screens/detail-view
       _checkUserVote();
     }
   }
@@ -117,7 +116,6 @@ class _PollWidgetState extends State<PollWidget>
       return;
     }
 
-    // Prevent redundant clicks on already selected option
     if (_hasVoted &&
         optionIndices.length == _votedOptionIndices.length &&
         optionIndices.every((i) => _votedOptionIndices.contains(i))) {
@@ -126,15 +124,12 @@ class _PollWidgetState extends State<PollWidget>
 
     setState(() => _isLoading = true);
 
-    // Store old state for rollback
     final bool wasVoted = _hasVoted;
     final List<int> oldVotedIndices = List.from(_votedOptionIndices);
     final List<int> oldCounts = List.from(_currentVoteCounts);
     final int oldTotal = _currentTotalVotes;
 
-    // Optimistic Update
     setState(() {
-      // If we were already voted, we need to remove old votes first locally
       if (wasVoted) {
         for (final index in oldVotedIndices) {
           if (index < _currentVoteCounts.length) {
@@ -144,7 +139,6 @@ class _PollWidgetState extends State<PollWidget>
         }
       }
 
-      // Add new votes
       for (final index in optionIndices) {
         if (index < _currentVoteCounts.length) {
           _currentVoteCounts[index]++;
@@ -168,7 +162,6 @@ class _PollWidgetState extends State<PollWidget>
         final voteDoc = await transaction.get(voteRef);
         final bool isChangeVote = voteDoc.exists;
 
-        // Read latest post data to ensure counts are accurate
         final postSnapshot = await transaction.get(postRef);
         if (!postSnapshot.exists) throw Exception("Post not found");
 
@@ -179,7 +172,6 @@ class _PollWidgetState extends State<PollWidget>
         List<int> newCounts = List.from(latestPoll.voteCounts);
         late int currentTotal;
 
-        // If changing vote, remove old votes from counts first
         if (isChangeVote) {
           final data = voteDoc.data();
           List<int> previousIndices = [];
@@ -196,13 +188,11 @@ class _PollWidgetState extends State<PollWidget>
               newCounts[index] = (newCounts[index] - 1).clamp(0, 999999);
             }
           }
-          // Recalculate total after decrement
           currentTotal = latestPoll.totalVotes - previousIndices.length;
         } else {
           currentTotal = latestPoll.totalVotes;
         }
 
-        // Add new votes
         for (final index in optionIndices) {
           if (index < newCounts.length) {
             newCounts[index] += 1;
@@ -225,7 +215,6 @@ class _PollWidgetState extends State<PollWidget>
     } catch (e) {
       logger.e('Vote failed', error: e);
       if (mounted) {
-        // Revert optimistic update
         setState(() {
           _hasVoted = wasVoted;
           _votedOptionIndices = oldVotedIndices;
@@ -247,7 +236,6 @@ class _PollWidgetState extends State<PollWidget>
     final theme = Theme.of(context);
     final isExpired = widget.pollData.endsAt.toDate().isBefore(DateTime.now());
 
-    // Show results if user voted or if expired
     final showResults = _hasVoted || isExpired;
 
     return AnimatedSize(
@@ -272,7 +260,6 @@ class _PollWidgetState extends State<PollWidget>
               }
             }),
 
-            // Submit button for multi-choice
             if (!showResults && widget.pollData.allowMultipleVotes)
               AnimatedOpacity(
                 opacity: _selectedIndices.isNotEmpty ? 1.0 : 0.0,
@@ -441,7 +428,6 @@ class _PollWidgetState extends State<PollWidget>
     final isExpired = widget.pollData.endsAt.toDate().isBefore(DateTime.now());
     final isSelected = _votedOptionIndices.contains(index);
 
-    // Determine visuals
     final Color barColor = isSelected
         ? theme.primaryColor.withValues(alpha: 0.2)
         : Colors.grey.withValues(alpha: 0.15);
@@ -461,7 +447,6 @@ class _PollWidgetState extends State<PollWidget>
           builder: (context, constraints) {
             return Stack(
               children: [
-                // 1. Background Bar (Empty)
                 Container(
                   height: 46.h,
                   width: constraints.maxWidth,
@@ -473,7 +458,6 @@ class _PollWidgetState extends State<PollWidget>
                   ),
                 ),
 
-                // 2. Animated Progress Bar
                 AnimatedBuilder(
                   animation: _animController,
                   builder: (context, child) {
@@ -490,7 +474,6 @@ class _PollWidgetState extends State<PollWidget>
                   },
                 ),
 
-                // 3. Text Content overlay
                 Container(
                   height: 46.h,
                   alignment: Alignment.centerLeft,
@@ -510,7 +493,6 @@ class _PollWidgetState extends State<PollWidget>
                         ),
                       ),
                       SizedBox(width: 8.w),
-                      // Percentage Text
                       Text(
                         '${(percentage * 100).toStringAsFixed(1)}%',
                         style: TextStyle(

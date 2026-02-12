@@ -8,7 +8,6 @@ class AppRouter {
     router = _createRouter();
   }
 
-  // --- Define Route Paths ---
   static const String splashPath = '/'; // Splash is the new root
   static const String welcomePath = '/welcome';
   static const String onboardingPath = '/onboarding';
@@ -26,7 +25,6 @@ class AppRouter {
       '/subjects/:gradeId/:subjectId/lessons/:lessonId/subtopics';
   static const String pastPapersPath = '/past-papers';
 
-  // 🚀 ADDED: Paths for new content viewers
   static const String videoPlayerPath = '/video-player';
   static const String noteViewerPath = '/note-viewer';
   static const String pdfViewerPath = '/pdf-viewer';
@@ -59,7 +57,6 @@ class AppRouter {
   static const String communityReviewPath = '/community/:communityId/review';
   static const String communitySelectionPath = '/select-community';
 
-  // Route Names
   static const String createPostName = 'create-post';
   static const String communityName = 'community';
   static const String communitiesListName = 'communities-list';
@@ -75,7 +72,6 @@ class AppRouter {
       initialLocation: splashPath,
       refreshListenable: authService,
       routes: [
-        // --- OUTSIDE SHELL (Full Screen) ---
         GoRoute(
           path: splashPath,
           builder: (context, state) => const SplashScreen(),
@@ -115,7 +111,6 @@ class AppRouter {
           builder: (context, state) {
             final typeStr = state.pathParameters['type'] ?? 'tag';
             final value = state.pathParameters['value'] ?? '';
-            // Make title optional in extra, fallback to value
             final titleRaw = state.extra;
             final String title = (titleRaw is String) ? titleRaw : value;
 
@@ -142,13 +137,11 @@ class AppRouter {
           },
         ),
 
-        // --- INSIDE SHELL (Persistent Nav Bar) ---
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
             return MainScaffold(navigationShell: navigationShell);
           },
           branches: [
-            // 1. HOME
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -159,7 +152,6 @@ class AppRouter {
               ],
             ),
 
-            // 2. COURSES (All Lessons)
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -169,7 +161,6 @@ class AppRouter {
               ],
             ),
 
-            // 3. COMMUNITY (Feed)
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -179,7 +170,6 @@ class AppRouter {
               ],
             ),
 
-            // 4. NOTIFICATION
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -189,7 +179,6 @@ class AppRouter {
               ],
             ),
 
-            // 5. PROFILE
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -201,8 +190,6 @@ class AppRouter {
           ],
         ),
 
-        // --- OTHER ROUTES (Fullscreen or Modals) ---
-        // Duplicate routes if needed or keep ones that shouldn't have nav bar:
         GoRoute(
           path: settingsPath,
           builder: (context, state) => const SettingsScreen(),
@@ -257,7 +244,6 @@ class AppRouter {
               if (extra['quotedPost'] is PostModel) {
                 quotedPost = extra['quotedPost'] as PostModel;
               }
-              // Handle other map fields if needed, but primary use here is for community
               communityId = extra['communityId'] as String?;
               communityName = extra['communityName'] as String?;
               communityIcon = extra['communityIcon'] as String?;
@@ -327,7 +313,6 @@ class AppRouter {
           builder: (context, state) => const CommunitySelectionScreen(),
         ),
 
-        // 🚀 FULL SCREEN: Subjects Flow
         GoRoute(
           path: '/subjects/:gradeId',
           builder: (context, state) =>
@@ -374,7 +359,6 @@ class AppRouter {
           ],
         ),
 
-        // Video/Viewers
         GoRoute(
           path: videoPlayerPath,
           builder: (context, state) {
@@ -389,7 +373,6 @@ class AppRouter {
           },
         ),
 
-        // ... (Other viewers kept as is, assuming they are fullscreen modal-like)
         GoRoute(
           path: noteViewerPath,
           builder: (context, state) {
@@ -449,43 +432,26 @@ class AppRouter {
           'Router Redirect: AuthStatus=$authStatus, Location=$location, Onboarding=$onboardingComplete',
         );
 
-        // --- REDIRECT LOGIC ---
-
-        // 1. While app is initializing, stay on current location (don't redirect during hot reload)
         if (authStatus == AuthStatus.uninitialized) {
-          // Only redirect to splash if we're truly at the splash screen
           if (location == splashPath) {
             return null; // Stay at splash
           }
-          // Otherwise, stay where we are (prevents hot reload redirects)
           return null;
         }
 
-        // 2. If user is authenticated
         if (authStatus == AuthStatus.authenticated) {
-          // If they are on splash or welcome, send them to home.
           if (location == splashPath || location == welcomePath) {
             return homePath;
           }
-          // If they're trying to access onboarding or login while logged in, redirect to home
           if (location == onboardingPath || location == loginPath) {
             return homePath;
           }
-        }
-        // 3. If user is NOT authenticated
-        else {
-          // 3a. If they are on protected routes, send to target entry point
+        } else {
           if (location == splashPath || location == homePath) {
-            // If onboarding is complete, they are likely a returning user -> Login
-            // Otherwise, they are a new user -> Welcome
             return onboardingComplete ? loginPath : welcomePath;
           }
-
-          // 3b. If they are anywhere else (onboardingPath, loginPath, welcomePath),
-          // let them stay. No aggressive redirects from onboardingPath to loginPath.
         }
 
-        // 4. No redirect needed
         return null;
       },
     );

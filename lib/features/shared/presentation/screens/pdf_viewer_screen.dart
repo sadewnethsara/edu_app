@@ -32,7 +32,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   int _pageCount = 0;
   int _currentPage = 0;
 
-  // Cache to avoid re-downloading
   static final Map<String, String> _downloadCache = {};
 
   @override
@@ -58,7 +57,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
     });
 
     try {
-      // Check cache first
       if (_downloadCache.containsKey(_currentItem.url)) {
         logger.i('Loading PDF from cache...');
         setState(() {
@@ -73,7 +71,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
 
       if (response.statusCode == 200) {
         final dir = await getTemporaryDirectory();
-        // Use a stable file name based on ID
         final file = File('${dir.path}/pdf_${_currentItem.id}.pdf');
         await file.writeAsBytes(response.bodyBytes);
 
@@ -108,7 +105,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
 
   void _finishViewing() {
     logger.i('Finished viewing PDFs.');
-    // Clear the "Continue Learning" bookmark
     Provider.of<ContinueLearningService>(
       context,
       listen: false,
@@ -117,22 +113,18 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   }
 
   void _markAsCompleted() {
-    // 1. Award points
     Provider.of<AuthService>(context, listen: false).awardPoints(10);
 
-    // 2. Mark as complete in Firestore
     Provider.of<AuthService>(
       context,
       listen: false,
     ).markContentAsCompleted(_currentItem.id);
 
-    // 3. Clear the "Continue Learning" bookmark
     Provider.of<ContinueLearningService>(
       context,
       listen: false,
     ).clearLastViewedItem();
 
-    // 4. Show success message
     logger.i('Marked as completed: ${_currentItem.name}');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -158,7 +150,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
               itemName,
               style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
             ),
-            // Show page count if PDF is loaded
             if (_pageCount > 0 && !_isLoading)
               Text(
                 'Page ${_currentPage + 1} of $_pageCount',
@@ -172,7 +163,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
       ),
       body: Stack(
         children: [
-          // Show PDF View
           if (_localPdfPath != null && !_isLoading && _errorMessage == null)
             PDFView(
               filePath: _localPdfPath,
@@ -206,7 +196,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
               },
             ),
 
-          // Show error message
           if (_errorMessage != null)
             Center(
               child: Padding(
@@ -242,7 +231,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
               ),
             ),
 
-          // Show loading indicator
           if (_isLoading)
             Center(
               child: Column(
@@ -279,7 +267,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
       ),
       child: Row(
         children: [
-          // "Mark as Completed" Button
           Expanded(
             child: OutlinedButton(
               onPressed: _markAsCompleted,
@@ -298,7 +285,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
           ),
           SizedBox(width: 16.w),
 
-          // "Next" or "Finish" Button
           Expanded(
             child: ElevatedButton(
               onPressed: _isLastItem ? _finishViewing : _goToNextPdf,

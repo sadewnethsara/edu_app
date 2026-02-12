@@ -14,12 +14,10 @@ class AppUsageScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final usageService = Provider.of<AppUsageService>(context);
 
-    // Prepare data for the chart
     final List<BarChartGroupData> chartData = [];
     final today = DateTime.now();
     double maxY = 0;
 
-    // Get the last 7 days
     for (int i = 6; i >= 0; i--) {
       final day = today.subtract(Duration(days: i));
       final dayStr = DateFormat('yyyy-MM-dd').format(day);
@@ -45,7 +43,6 @@ class AppUsageScreen extends StatelessWidget {
       );
     }
 
-    // Calculate max Y value cleanly
     final chartMaxY = (maxY < 50) ? 60.0 : (maxY * 1.2).ceilToDouble();
 
     return Scaffold(
@@ -55,7 +52,6 @@ class AppUsageScreen extends StatelessWidget {
         bottom: true,
         child: CustomScrollView(
           slivers: [
-            // App Bar
             SliverAppBar(
               expandedHeight: 140.h,
               pinned: true,
@@ -97,14 +93,12 @@ class AppUsageScreen extends StatelessWidget {
               ),
             ),
 
-            // Content
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(20.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // --- Header ---
                     Text(
                       'Your Weekly Activity',
                       style: theme.textTheme.headlineSmall?.copyWith(
@@ -120,7 +114,6 @@ class AppUsageScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 24.h),
 
-                    // --- Graph Container ---
                     Container(
                       height: 300.h,
                       padding: EdgeInsets.all(16.w).copyWith(top: 32.h),
@@ -157,7 +150,6 @@ class AppUsageScreen extends StatelessWidget {
                               sideTitles: SideTitles(
                                 showTitles: true,
                                 reservedSize: 35.w,
-                                // 🚀 FIX 4: Simplified getTitlesWidget
                                 getTitlesWidget: (value, meta) {
                                   if (value == 0) return const Text('');
                                   if (value == meta.max) {
@@ -187,7 +179,6 @@ class AppUsageScreen extends StatelessWidget {
                                   final day = today.subtract(
                                     Duration(days: 6 - value.toInt()),
                                   );
-                                  // 🚀 FIX 2: Removed problematic SideTitleWidget wrapper
                                   return Padding(
                                     padding: EdgeInsets.only(top: 8.h),
                                     child: Text(
@@ -221,7 +212,6 @@ class AppUsageScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 24.h),
 
-                    // --- Analysis ---
                     Text(
                       'Performance Summary',
                       style: theme.textTheme.headlineSmall?.copyWith(
@@ -230,7 +220,6 @@ class AppUsageScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 12.h),
 
-                    // 🚀 FIX 3: Passed usageService
                     _buildAnalysisCard(
                       context,
                       usageService, // Pass the service
@@ -247,7 +236,6 @@ class AppUsageScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 12.h),
 
-                    // 🚀 FIX 3: Passed usageService
                     _buildAnalysisCard(
                       context,
                       usageService, // Pass the service
@@ -266,7 +254,6 @@ class AppUsageScreen extends StatelessWidget {
     );
   }
 
-  // 🚀 FIX 3: Added AppUsageService parameter
   Widget _buildAnalysisCard(
     BuildContext context,
     AppUsageService usageService,
@@ -328,7 +315,6 @@ class AppUsageScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              // 🚀 FIX 4: Use the passed 'usageService' variable
               if (title == 'Today vs Yesterday')
                 Text(
                   usageService.yesterdayUsageSeconds > 0

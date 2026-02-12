@@ -1,4 +1,3 @@
-// SHARED FEATURE EXPORTS
 export 'presentation/screens/user_list_screen.dart';
 export 'presentation/screens/follow_list_screen.dart';
 export 'presentation/screens/image_view_screen.dart';

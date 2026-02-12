@@ -14,7 +14,6 @@ class StreakScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final streakService = Provider.of<StreakService>(context);
 
-    // Prepare data for the chart
     final List<BarChartGroupData> chartData = [];
     final today = DateTime(
       DateTime.now().year,
@@ -22,12 +21,10 @@ class StreakScreen extends StatelessWidget {
       DateTime.now().day,
     );
 
-    // Get the last 7 days for the chart
     for (int i = 6; i >= 0; i--) {
       final day = today.subtract(Duration(days: i));
       final dayStr = DateFormat('yyyy-MM-dd').format(day);
 
-      // Check if this day is in the streak history
       final bool visited = streakService.streakHistory.any(
         (visit) => DateFormat('yyyy-MM-dd').format(visit) == dayStr,
       );
@@ -92,18 +89,15 @@ class StreakScreen extends StatelessWidget {
               ),
             ),
 
-            // Main Content
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(20.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // --- Current Streak Card ---
                     _buildCurrentStreakCard(theme, streakService.currentStreak),
                     SizedBox(height: 24.h),
 
-                    // --- 7-Day History Graph ---
                     Text(
                       'Last 7 Days',
                       style: theme.textTheme.headlineSmall?.copyWith(
@@ -162,7 +156,6 @@ class StreakScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 24.h),
 
-                    // --- How it works ---
                     _buildInfoCard(theme),
                   ],
                 ),

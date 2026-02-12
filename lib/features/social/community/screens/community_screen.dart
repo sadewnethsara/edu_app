@@ -240,7 +240,6 @@ class _CommunityScreenState extends State<CommunityScreen>
                 background: Stack(
                   fit: StackFit.expand,
                   children: [
-                    // Banner
                     _community!.bannerUrl != null
                         ? CachedNetworkImage(
                             imageUrl: _community!.bannerUrl!,
@@ -254,7 +253,6 @@ class _CommunityScreenState extends State<CommunityScreen>
                               color: Colors.grey,
                             ),
                           ),
-                    // Gradient overlay
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -267,14 +265,12 @@ class _CommunityScreenState extends State<CommunityScreen>
                         ),
                       ),
                     ),
-                    // Content
                     Positioned(
                       bottom: 16.h,
                       left: 16.w,
                       right: 16.w,
                       child: Row(
                         children: [
-                          // Icon
                           Container(
                             width: 64.w,
                             height: 64.w,
@@ -788,7 +784,6 @@ class _CommunityScreenState extends State<CommunityScreen>
 
   void _handleResourceClick(CommunityResourceModel resource) {
     if (resource.type == ResourceType.video) {
-      // Create a ContentItem for the player
       final item = ContentItem(
         id: resource.id,
         name: resource.title,
@@ -824,8 +819,6 @@ class _CommunityScreenState extends State<CommunityScreen>
         ),
       );
     } else if (resource.type == ResourceType.link) {
-      // Handle link - maybe open browser or in-app webview
-      // For now, let's just show a banner or use url_launcher if available
       MessageBanner.show(context, message: 'Opening link: ${resource.url}');
     }
   }

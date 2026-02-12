@@ -15,7 +15,6 @@ class _ClearCacheScreenState extends State<ClearCacheScreen> {
   bool _isLoading = true;
   int _keepDuration = 3; // days
 
-  // Simulated storage data
   final double _totalDeviceStorage = 128.0; // GB
   final double _usedDeviceStorage = 82.5; // GB
 
@@ -65,7 +64,6 @@ class _ClearCacheScreenState extends State<ClearCacheScreen> {
     }
   }
 
-  // ... _buildClearConfirmationSheet remains similar but styled ...
   Widget _buildClearConfirmationSheet() {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -167,8 +165,6 @@ class _ClearCacheScreenState extends State<ClearCacheScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // Percentage for indicator
-    // Assuming max cache budget or relative to device, but here we visualize relative to "math cache budget" of e.g. 1GB for visual effect
     final double cachePercentage = (_cacheSize / 1024).clamp(
       0.0,
       1.0,
@@ -195,25 +191,21 @@ class _ClearCacheScreenState extends State<ClearCacheScreen> {
                     padding: EdgeInsets.all(20.w),
                     child: Column(
                       children: [
-                        // --- Circular Indicator ---
                         _buildCircularIndicator(theme, isDark, cachePercentage),
                         SizedBox(height: 32.h),
 
-                        // --- Keep Media Section ---
                         _buildSectionHeader('Auto-Remove Media'),
                         SizedBox(height: 16.h),
                         _buildKeepMediaSelector(theme, isDark),
 
                         SizedBox(height: 32.h),
 
-                        // --- Breakdown Section ---
                         _buildSectionHeader('Storage Breakdown'),
                         SizedBox(height: 16.h),
                         _buildBreakdownList(theme, isDark),
 
                         SizedBox(height: 40.h),
 
-                        // --- Clear Button ---
                         ElevatedButton(
                           onPressed: _cacheSize > 0 ? _clearCache : null,
                           style: ElevatedButton.styleFrom(

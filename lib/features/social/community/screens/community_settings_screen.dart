@@ -23,7 +23,6 @@ class _CommunitySettingsScreenState extends State<CommunitySettingsScreen> {
   bool _isLoading = true;
   bool _isSaving = false;
 
-  // Local settings state
   bool _isPrivate = false;
   bool _requiresJoinApproval = false;
   bool _requiresPostApproval = false;
@@ -54,7 +53,6 @@ class _CommunitySettingsScreenState extends State<CommunitySettingsScreen> {
   Future<void> _updateSetting(String key, dynamic value) async {
     if (_community == null) return;
 
-    // Optimistic Update
     setState(() {
       if (key == 'isPrivate') _isPrivate = value;
       if (key == 'requiresJoinApproval') _requiresJoinApproval = value;
@@ -72,7 +70,6 @@ class _CommunitySettingsScreenState extends State<CommunitySettingsScreen> {
         );
       }
     } catch (e) {
-      // Revert if failed
       _loadCommunity();
       if (mounted) {
         MessageBanner.show(

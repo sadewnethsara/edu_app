@@ -39,7 +39,6 @@ class _TermsScreenState extends State<TermsScreen> {
           .get();
       if (doc.exists && doc.data() != null && doc.data()!['content'] != null) {
         String content = doc.data()!['content'];
-        // Ensure proper HTML structure if missing
         if (!content.contains('<html>')) {
           content =
               '''

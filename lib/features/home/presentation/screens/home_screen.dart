@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:math/core/services/auth_service.dart';
 import 'package:math/core/services/streak_service.dart';
-// You have this import
 import 'package:math/core/widgets/streak_dialog.dart';
 import 'package:math/core/widgets/streak_home_widget.dart';
 import 'package:provider/provider.dart';
@@ -19,27 +18,21 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Run this check *after* the first frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _syncAndCheckStreak();
     });
   }
 
-  // This function loads from Firebase *first*, then runs the daily check
   Future<void> _syncAndCheckStreak() async {
     final streakService = Provider.of<StreakService>(context, listen: false);
 
-    // 1. SYNC from Firebase first
     await streakService.syncFromFirebase();
 
-    // 2. Then, run the daily check
     final status = await streakService.updateStreakOnAppOpen();
 
-    // 3. Show dialog if the streak was lost or increased
     if (status == StreakUpdateStatus.streakIncreased ||
         status == StreakUpdateStatus.streakLost) {
       if (mounted) {
-        // Check if the widget is still in the tree
         showDialog(
           context: context,
           barrierDismissible: false, // User must tap button
@@ -101,10 +94,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontSize: 16.sp, color: Colors.grey),
               ),
 
-            // --- ADDED WIDGET ---
             SizedBox(height: 32.h),
             const StreakHomeWidget(),
-            // --- END OF WIDGET ---
           ],
         ),
       ),

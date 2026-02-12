@@ -124,7 +124,6 @@ class UnifiedSliverAppBar extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              // Decorative Icon
               Positioned(
                 right: -30,
                 bottom: -40,
@@ -134,7 +133,6 @@ class UnifiedSliverAppBar extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.1),
                 ),
               ),
-              // Breadcrumb with Home Button
               Positioned(
                 top: 50.h,
                 left: 16.w,
@@ -156,7 +154,6 @@ class UnifiedSliverAppBar extends StatelessWidget {
                         )
                       : Row(
                           children: [
-                            // Home Icon Button
                             InkWell(
                               onTap: onHome ?? () => context.go('/'),
                               borderRadius: BorderRadius.circular(20.r),
@@ -178,14 +175,12 @@ class UnifiedSliverAppBar extends StatelessWidget {
                               ),
                             ),
                             SizedBox(width: 8.w),
-                            // Vertical Divider Line
                             Container(
                               width: 1.5,
                               height: 16.h,
                               color: Colors.white.withValues(alpha: 0.4),
                             ),
                             SizedBox(width: 8.w),
-                            // Breadcrumb
                             Expanded(child: breadcrumb),
                           ],
                         ),

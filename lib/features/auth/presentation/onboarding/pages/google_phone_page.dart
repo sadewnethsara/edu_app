@@ -39,7 +39,6 @@ class _GooglePhonePageState extends State<GooglePhonePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // --- ✨ Header ---
               Text(
                 "Verify your phone",
                 style: textTheme.headlineMedium?.copyWith(
@@ -58,7 +57,6 @@ class _GooglePhonePageState extends State<GooglePhonePage> {
               ),
               SizedBox(height: 32.h),
 
-              // --- ✨ Glass Card ---
               ClipRRect(
                 borderRadius: BorderRadius.circular(20.r),
                 child: BackdropFilter(
@@ -75,7 +73,6 @@ class _GooglePhonePageState extends State<GooglePhonePage> {
                       padding: EdgeInsets.all(24.w),
                       child: Column(
                         children: [
-                          // --- Phone ---
                           TextFormField(
                             controller: _mobileController,
                             onChanged: widget.onMobileChanged,

@@ -43,20 +43,17 @@ class _LiveEventCardState extends State<LiveEventCard> {
   void _calculateTimeLeft() {
     final now = DateTime.now();
 
-    // Check if event is forcibly live by admin
     if (widget.event.isLive) {
       if (mounted) setState(() => _isLive = true);
       return;
     }
 
-    // Calculate time until event start
     if (now.isAfter(widget.event.startTime)) {
       _timeLeftToStart = Duration.zero;
     } else {
       _timeLeftToStart = widget.event.startTime.difference(now);
     }
 
-    // Calculate time until link enable
     final linkEnableTime =
         widget.event.linkEnableTime ?? widget.event.startTime;
     if (now.isAfter(linkEnableTime)) {
@@ -88,21 +85,12 @@ class _LiveEventCardState extends State<LiveEventCard> {
   Widget build(BuildContext context) {
     final theme = widget.theme;
 
-    // Button is enabled if:
-    // 1. Event is marked isLive OR
-    // 2. Link enable time has passed (timeLeftToLink <= 0)
     bool isLinkEnabled = _isLive || _timeLeftToLink.inSeconds <= 0;
 
-    // Display different text based on state
     String buttonText;
     if (isLinkEnabled) {
       buttonText = "Join Meeting";
     } else {
-      // If we have a separate linkEnableTime, we might want to show that countdown
-      // But typically user cares about when event starts.
-      // If link enables BEFORE start, we show "Link active in X"
-      // If link enables AT start, we show "Starts in X"
-
       if (widget.event.linkEnableTime != null &&
           widget.event.linkEnableTime!.isBefore(widget.event.startTime)) {
         buttonText = "Link active in ${_formatDuration(_timeLeftToLink)}";

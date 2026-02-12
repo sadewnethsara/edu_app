@@ -6,7 +6,6 @@ import 'package:math/core/services/auth_service.dart';
 import 'package:math/core/services/logger_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// 🚀 UPDATED: Enum names for clarity
 enum StreakUpdateStatus {
   noChange, // User already opened the app today
   streakKept, // Streak is the same (visited within 7-day grace period)
@@ -15,22 +14,18 @@ enum StreakUpdateStatus {
 }
 
 class StreakService with ChangeNotifier {
-  // --- NATIVE HOME WIDGET KEYS ---
   static const String _widgetGroupId = 'group.com.nethsara.math';
   static const String _widgetStreakKey = 'streak_count';
   static const String _androidWidgetName = 'StreakWidgetProvider';
   static const String _iosWidgetName = 'StreakWidget';
 
-  // --- LOCAL STORAGE KEY ---
   static const String _streakKey = 'streak_count';
 
-  // --- FIREBASE and AUTH ---
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   AuthService? _authService;
   String? get _userID => _authService?.user?.uid;
   bool _isSyncedFromFirebase = false;
 
-  // --- STATE ---
   int _currentStreak = 0;
   List<DateTime> _streakHistory =
       []; // Stores sorted visit dates (newest first)
@@ -43,13 +38,11 @@ class StreakService with ChangeNotifier {
   bool get isSynced => _isSyncedFromFirebase;
   int get previousStreak => _previousStreak;
 
-  /// Called by the ProxyProvider in main.dart to link services
   void updateAuth(AuthService auth) {
     _authService = auth;
     if (auth.status == AuthStatus.authenticated) {
       syncFromFirebase(); // Sync when user is confirmed logged in
     } else {
-      // User logged out, clear local state
       _currentStreak = 0;
       _previousStreak = 0;
       _streakHistory = [];
@@ -58,7 +51,6 @@ class StreakService with ChangeNotifier {
     }
   }
 
-  // --- 🚀 HELPER FUNCTIONS (NEW) ---
   String _getDateString(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
   DateTime _parseDateString(String dateStr) => DateTime.parse(dateStr);
   DateTime _getTodayDate() {
@@ -66,26 +58,21 @@ class StreakService with ChangeNotifier {
     return DateTime(now.year, now.month, now.day);
   }
 
-  // --- 🚀 HELPER: SAVE TO LOCAL (WIDGET) ---
   Future<void> _saveToLocal() async {
     final prefs = await SharedPreferences.getInstance();
-    // Only save the count, as that's all the widget needs
     await prefs.setInt(_streakKey, _currentStreak);
     debugPrint("Streak: Saved to local (for widget).");
   }
 
-  // --- 🚀 HELPER: SAVE TO FIREBASE (MASTER SOURCE) ---
   Future<void> _saveToFirebase() async {
     if (_userID == null) {
       return;
     } // Not logged in
 
-    // Prune history to last 100 visits for performance
     if (_streakHistory.length > 100) {
       _streakHistory = _streakHistory.sublist(0, 100);
     }
 
-    // Save dates as strings
     final stringHistory = _streakHistory
         .map((date) => _getDateString(date))
         .toList();
@@ -105,17 +92,12 @@ class StreakService with ChangeNotifier {
     }
   }
 
-  // --- 🚀 HELPER: LOAD FROM LOCAL (FALLBACK) ---
   Future<void> _loadFromLocal() async {
     final prefs = await SharedPreferences.getInstance();
     _currentStreak = prefs.getInt(_streakKey) ?? 0;
-    // Note: We don't load history from local, only the count for the widget.
-    // The history is only managed by Firebase.
     debugPrint("Streak: Loaded from local (fallback).");
   }
 
-  // --- 🚀 UPDATED: SYNC FROM FIREBASE ---
-  /// Loads data from Firebase (if possible) into the service.
   Future<void> syncFromFirebase() async {
     if (_userID == null) {
       debugPrint("Streak: Skipping Firebase sync (no user).");
@@ -133,11 +115,9 @@ class StreakService with ChangeNotifier {
           doc.data()!.containsKey('streakData')) {
         final data = doc.data()!['streakData'];
 
-        // Load data from Firebase
         _streakHistory = (data['streakHistory'] as List<dynamic>? ?? [])
             .map((dateStr) => _parseDateString(dateStr as String))
             .toList();
-        // Sort newest first, just in case
         _streakHistory.sort((a, b) => b.compareTo(a));
 
         _recalculateStreakFromHistory(); // Calculate streak from this history
@@ -146,7 +126,6 @@ class StreakService with ChangeNotifier {
         await _saveToLocal(); // Save cloud data to local prefs
         debugPrint("Streak: Synced from Firebase.");
       } else {
-        // No data in Firebase, just load from local
         await _loadFromLocal();
       }
     } catch (e) {
@@ -158,8 +137,6 @@ class StreakService with ChangeNotifier {
     notifyListeners();
   }
 
-  // --- 🚀 NEW: RECALCULATE STREAK ---
-  /// Calculates the current streak based on the 7-DAY GRACE PERIOD
   void _recalculateStreakFromHistory() {
     if (_streakHistory.isEmpty) {
       _currentStreak = 0;
@@ -168,17 +145,14 @@ class StreakService with ChangeNotifier {
 
     final today = _getTodayDate();
 
-    // Check if the most recent visit was too long ago
     final lastVisit = _streakHistory[0];
     final daysSinceLastVisit = today.difference(lastVisit).inDays;
 
     if (daysSinceLastVisit > 7) {
-      // 🚀 7-DAY RULE: Streak is lost
       _currentStreak = 0;
       return;
     }
 
-    // Calculate streak
     int streak = 1;
     for (int i = 0; i < _streakHistory.length - 1; i++) {
       DateTime currentVisit = _streakHistory[i];
@@ -187,20 +161,15 @@ class StreakService with ChangeNotifier {
       final diff = currentVisit.difference(previousVisit).inDays;
 
       if (diff <= 7) {
-        // 🚀 7-DAY RULE: Visit is within the grace period, streak continues
         streak++;
       } else {
-        // Gap is > 7 days, streak breaks
         break;
       }
     }
     _currentStreak = streak;
   }
 
-  // --- 🚀 UPDATED: APP OPEN LOGIC ---
-  /// Checks and updates the streak. Called after syncFromFirebase().
   Future<StreakUpdateStatus> updateStreakOnAppOpen() async {
-    // Make sure data is loaded first
     if (!_isSyncedFromFirebase) {
       debugPrint("Streak: Waiting for Firebase sync...");
       await syncFromFirebase();
@@ -210,7 +179,6 @@ class StreakService with ChangeNotifier {
     _streakWasLost = false;
     StreakUpdateStatus status = StreakUpdateStatus.noChange;
 
-    // Check if user already opened the app today
     if (_streakHistory.isNotEmpty &&
         _streakHistory[0].isAtSameMomentAs(today)) {
       debugPrint("Streak: User already opened app today.");
@@ -218,16 +186,13 @@ class StreakService with ChangeNotifier {
       return StreakUpdateStatus.noChange;
     }
 
-    // --- This is a new visit for today ---
     int oldStreak = _currentStreak;
 
-    // Check for streak loss before adding today's visit
     if (_streakHistory.isNotEmpty) {
       final lastVisit = _streakHistory[0];
       final daysDifference = today.difference(lastVisit).inDays;
 
       if (daysDifference > 7) {
-        // 🚀 7-DAY RULE: Streak is broken
         logger.i('Streak lost. Last visit was $daysDifference days ago.');
         _previousStreak = oldStreak;
         _streakHistory = [today]; // Reset history to just today
@@ -235,19 +200,16 @@ class StreakService with ChangeNotifier {
         _streakWasLost = _previousStreak > 0;
         status = StreakUpdateStatus.streakLost;
       } else {
-        // Streak is not broken, just add today
         _streakHistory.insert(0, today);
         _recalculateStreakFromHistory(); // Recalculate
 
         if (_currentStreak > oldStreak) {
           status = StreakUpdateStatus.streakIncreased;
         } else {
-          // Visited within grace period, but not consecutive
           status = StreakUpdateStatus.streakKept;
         }
       }
     } else {
-      // First time user - start fresh with streak of 1
       _streakHistory = [today];
       _currentStreak = 1;
       _previousStreak = 0;
@@ -255,7 +217,6 @@ class StreakService with ChangeNotifier {
       status = StreakUpdateStatus.streakIncreased;
     }
 
-    // --- Save and Update ---
     await _saveToFirebase();
     await _saveToLocal();
     await _updateHomeWidget();
@@ -265,7 +226,6 @@ class StreakService with ChangeNotifier {
     return status;
   }
 
-  /// Sends the current streak data to the native home screen widget
   Future<void> _updateHomeWidget() async {
     try {
       await HomeWidget.setAppGroupId(_widgetGroupId);
@@ -278,8 +238,4 @@ class StreakService with ChangeNotifier {
       debugPrint('Error updating home widget: $e');
     }
   }
-
-  // ❌ REMOVED: _getStartOfWeek (no longer needed)
-  // ❌ REMOVED: _weekLoginDays logic (replaced by _streakHistory)
-  // ❌ REMOVED: _lastLoginKey (replaced by _streakHistory)
 }

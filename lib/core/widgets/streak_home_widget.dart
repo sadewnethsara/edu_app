@@ -8,12 +8,9 @@ class StreakHomeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use Consumer to rebuild this widget when streak changes
     return Consumer<StreakService>(
       builder: (context, streakService, child) {
-        // If data hasn't been synced from Firebase yet, show loading
         if (!streakService.isSynced) {
-          // You can show a loading spinner, but this is less intrusive
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
             decoration: BoxDecoration(
@@ -44,7 +41,6 @@ class StreakHomeWidget extends StatelessWidget {
           );
         }
 
-        // Data is loaded, show the real widget
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           decoration: BoxDecoration(
@@ -54,7 +50,6 @@ class StreakHomeWidget extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min, // Take only needed space
             children: [
-              // Flame Icon
               Icon(
                 Icons.local_fire_department,
                 color: (streakService.currentStreak > 0)
@@ -64,7 +59,6 @@ class StreakHomeWidget extends StatelessWidget {
               ),
               SizedBox(width: 16.w),
 
-              // Streak Text
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

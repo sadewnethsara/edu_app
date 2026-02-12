@@ -16,7 +16,6 @@ class CommunityService {
   factory CommunityService() => _instance;
   CommunityService._internal();
 
-  /// Create a new community
   Future<String?> createCommunity({
     required String name,
     required String description,
@@ -33,7 +32,6 @@ class CommunityService {
       String? iconUrl;
       String? bannerUrl;
 
-      // Upload images if exists
       if (iconFile != null) {
         iconUrl = await _uploadCommunityImage(iconFile, communityId, 'icon');
       }
@@ -61,7 +59,6 @@ class CommunityService {
 
       await docRef.set(community.toJson());
 
-      // Add creator as Admin member (skip internal join notification here)
       await joinCommunity(
         communityId,
         creatorId,
@@ -69,7 +66,6 @@ class CommunityService {
         skipNotification: true,
       );
 
-      // Send "Community Created" notification to creator
       await SocialService().sendNotification(
         toUserId: creatorId,
         title: 'Community Created!',
@@ -85,7 +81,6 @@ class CommunityService {
     }
   }
 
-  /// Upload community image (icon/banner)
   Future<String?> _uploadCommunityImage(
     File file,
     String communityId,
@@ -106,7 +101,6 @@ class CommunityService {
     }
   }
 
-  /// Join a community
   Future<void> joinCommunity(
     String communityId,
     String userId, {
@@ -140,7 +134,6 @@ class CommunityService {
         transaction.set(memberRef, member.toJson());
 
         if (member.status == MemberStatus.approved) {
-          // Increment member count only if approved
           final communityRef = _firestore
               .collection('communities')
               .doc(communityId);
@@ -150,10 +143,8 @@ class CommunityService {
         }
       });
 
-      // --- Send Notifications ---
       if (!skipNotification && community != null) {
         if (member.status == MemberStatus.pending) {
-          // Notify the User that request is sent
           await SocialService().sendNotification(
             toUserId: userId,
             title: 'Request Sent',
@@ -163,7 +154,6 @@ class CommunityService {
             targetContentId: communityId,
           );
 
-          // Notify the Community Owner about request
           await SocialService().sendNotification(
             toUserId: community.creatorId,
             title: 'New Join Request',
@@ -174,7 +164,6 @@ class CommunityService {
             targetContentId: communityId,
           );
         } else {
-          // 1. Notify the User who joined
           await SocialService().sendNotification(
             toUserId: userId,
             title: 'Welcome!',
@@ -183,7 +172,6 @@ class CommunityService {
             targetContentId: communityId,
           );
 
-          // 2. Notify the Community Owner
           if (community.creatorId != userId) {
             final joinerDoc = await _firestore
                 .collection('users')
@@ -210,7 +198,6 @@ class CommunityService {
     }
   }
 
-  /// Leave a community
   Future<void> leaveCommunity(String communityId, String userId) async {
     try {
       final memberRef = _firestore
@@ -225,7 +212,6 @@ class CommunityService {
 
         transaction.delete(memberRef);
 
-        // Decrement member count
         final communityRef = _firestore
             .collection('communities')
             .doc(communityId);
@@ -239,13 +225,11 @@ class CommunityService {
     }
   }
 
-  /// Check if user is a member (approved)
   Future<bool> isMember(String communityId, String userId) async {
     final member = await getMember(communityId, userId);
     return member != null && member.status == MemberStatus.approved;
   }
 
-  /// Get Member info
   Future<CommunityMemberModel?> getMember(
     String communityId,
     String userId,
@@ -264,7 +248,6 @@ class CommunityService {
     }
   }
 
-  /// Update Member Status (Approve/Reject)
   Future<void> updateMemberStatus(
     String communityId,
     String userId,
@@ -286,7 +269,6 @@ class CommunityService {
 
         transaction.update(memberRef, {'status': newStatus.name});
 
-        // If becoming approved from pending
         if (oldMember.status == MemberStatus.pending &&
             newStatus == MemberStatus.approved) {
           final communityRef = _firestore
@@ -295,9 +277,7 @@ class CommunityService {
           transaction.update(communityRef, {
             'memberCount': FieldValue.increment(1),
           });
-        }
-        // If becoming rejected/pending from approved
-        else if (oldMember.status == MemberStatus.approved &&
+        } else if (oldMember.status == MemberStatus.approved &&
             newStatus != MemberStatus.approved) {
           final communityRef = _firestore
               .collection('communities')
@@ -312,7 +292,6 @@ class CommunityService {
     }
   }
 
-  /// Get Community Details
   Future<CommunityModel?> getCommunity(String communityId) async {
     try {
       final doc = await _firestore
@@ -327,35 +306,8 @@ class CommunityService {
     }
   }
 
-  /// Get User's Communities
-  /// NOTE: This depends on how we structure the queries.
-  /// Since "members" is a subcollection, querying "all communities I'm in" requires a Collection Group query
-  /// OR keeping a denormalized list of communities in the User document.
-  /// Ideally, for scalability, we should use a separate top-level 'community_members' collection
-  /// or list in user profile.
-  /// For this implementation, I will assume we fetch the communities the user has joined
-  /// by querying a separate collection or we can just fetch all and filter client side (bad for scale)
-  /// OR, better: Add a 'joinedCommunities' subcollection to the USER.
-  ///
-  /// Let's update `joinCommunity` to also add to `users/{uid}/communities/{communityId}` for easy lookup.
   Future<List<CommunityModel>> getUserCommunities(String userId) async {
     try {
-      // Fetch IDs from user's subcollection (we need to implement this in join/leave first)
-      // For now, let's assume we implement the dual-write in joinCommunity.
-      // Wait, I should update joinCommunity to write to user's collection too.
-      // But let's check `joinCommunity`.
-
-      // Since I haven't modified the User model to hold a list, I'll do a Collection Group query
-      // if 'members' is a subcollection of 'communities'.
-      // Code:
-      // return _firestore.collectionGroup('members').where('userId', isEqualTo: userId).get()...
-      // But 'userId' is the doc ID in existing implementation? No, I added userId as a field in `CommunityMemberModel`.
-      // Yes: `userId: doc.id` in fromSnapshot, but also passed in constructor.
-
-      // Let's rely on collectionGroup for now, or better:
-      // Let's keep it simple and clean: Use a denormalized map/list if possible, but
-      // Collection Group 'members' where userId == myId is valid.
-
       final querySnapshot = await _firestore
           .collectionGroup('members')
           .where('userId', isEqualTo: userId)
@@ -363,9 +315,6 @@ class CommunityService {
 
       List<String> communityIds = [];
       for (var doc in querySnapshot.docs) {
-        // The parent of 'members' collection is the community doc
-        // path: communities/{communityId}/members/{userId}
-        // doc.reference.parent.parent?.id
         if (doc.reference.parent.parent != null) {
           communityIds.add(doc.reference.parent.parent!.id);
         }
@@ -373,7 +322,6 @@ class CommunityService {
 
       if (communityIds.isEmpty) return [];
 
-      // Fetch actual community docs (in chunks of 10)
       List<CommunityModel> communities = [];
       for (var i = 0; i < communityIds.length; i += 10) {
         final chunk = communityIds.sublist(
@@ -395,7 +343,6 @@ class CommunityService {
     }
   }
 
-  /// Get Trending/Recommended Communities
   Future<List<CommunityModel>> getRecommendedCommunities({
     int limit = 10,
   }) async {
@@ -413,13 +360,10 @@ class CommunityService {
     }
   }
 
-  /// Search Communities
   Future<List<CommunityModel>> searchCommunities(String query) async {
     try {
       if (query.isEmpty) return [];
 
-      // Note: Firestore doesn't support full-text search.
-      // We implement a simple startAt/endAt search for name.
       final snap = await _firestore
           .collection('communities')
           .where('name', isGreaterThanOrEqualTo: query)
@@ -434,7 +378,6 @@ class CommunityService {
     }
   }
 
-  /// Update Community Details
   Future<void> updateCommunity(
     String communityId,
     Map<String, dynamic> updates,
@@ -450,7 +393,6 @@ class CommunityService {
     }
   }
 
-  /// Get pending posts for a community
   Future<List<PostModel>> getPendingPosts(String communityId) async {
     try {
       final snapshot = await _firestore
@@ -467,7 +409,6 @@ class CommunityService {
     }
   }
 
-  /// Approve a pending post
   Future<void> approvePost(String postId, String approverId) async {
     try {
       final postRef = _firestore.collection('posts').doc(postId);
@@ -482,7 +423,6 @@ class CommunityService {
         'approvedAt': FieldValue.serverTimestamp(),
       });
 
-      // Notify the author
       await SocialService().sendNotification(
         toUserId: post.authorId,
         title: 'Post Approved',
@@ -496,7 +436,6 @@ class CommunityService {
     }
   }
 
-  /// Reject a pending post
   Future<void> rejectPost(String postId) async {
     try {
       await _firestore.collection('posts').doc(postId).update({
@@ -508,7 +447,6 @@ class CommunityService {
     }
   }
 
-  /// Get all members of a community
   Stream<List<CommunityMemberModel>> getCommunityMembers(String communityId) {
     return _firestore
         .collection('communities')
@@ -523,9 +461,6 @@ class CommunityService {
         );
   }
 
-  // --- Community Resources ---
-
-  /// Upload a resource file (video/document)
   Future<String?> uploadResourceFile({
     required String communityId,
     required String resourceId,
@@ -549,7 +484,6 @@ class CommunityService {
     }
   }
 
-  /// Upload community profile/banner photo
   Future<String?> uploadCommunityPhoto({
     required String communityId,
     required File file,
@@ -570,7 +504,6 @@ class CommunityService {
     }
   }
 
-  /// Add a resource to a community
   Future<void> addResource({
     required String communityId,
     required String title,
@@ -603,7 +536,6 @@ class CommunityService {
 
       await docRef.set(resource.toJson());
 
-      // Notify admin if not auto-approved
       if (!isAutoApproved) {
         final community = await getCommunity(communityId);
         if (community != null) {
@@ -622,7 +554,6 @@ class CommunityService {
     }
   }
 
-  /// Get approved resources for a community
   Stream<List<CommunityResourceModel>> getApprovedResources(
     String communityId,
   ) {
@@ -640,7 +571,6 @@ class CommunityService {
         );
   }
 
-  /// Get pending resources (for admins)
   Future<List<CommunityResourceModel>> getPendingResources(
     String communityId,
   ) async {
@@ -662,7 +592,6 @@ class CommunityService {
     }
   }
 
-  /// Approve a resource
   Future<void> approveResource(
     String communityId,
     String resourceId,
@@ -686,7 +615,6 @@ class CommunityService {
         'approvedAt': FieldValue.serverTimestamp(),
       });
 
-      // Notify contributor
       await SocialService().sendNotification(
         toUserId: resource.addedBy,
         title: 'Resource Approved!',
@@ -700,7 +628,6 @@ class CommunityService {
     }
   }
 
-  /// Reject/Delete a resource
   Future<void> rejectResource(String communityId, String resourceId) async {
     try {
       await _firestore

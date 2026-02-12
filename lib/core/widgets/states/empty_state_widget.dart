@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// Reusable empty state widget for lists
 class EmptyStateWidget extends StatelessWidget {
   final IconData icon;
   final String title;

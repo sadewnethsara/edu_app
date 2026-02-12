@@ -31,7 +31,6 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
   int _pageCount = 0;
   int _currentPage = 0;
 
-  // Appearance settings
   Color _backgroundColor = Colors.grey.shade200;
   double _brightness = 1.0;
   bool _nightMode = false;
@@ -180,7 +179,6 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
         color: _backgroundColor,
         child: Stack(
           children: [
-            // PDF View
             if (_localPdfPath != null && !_isLoading && _errorMessage == null)
               PDFView(
                 key: Key('pdf_view_$_nightMode'),
@@ -217,7 +215,6 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
                 },
               ),
 
-            // Brightness & Tint Overlay
             if (_localPdfPath != null && !_isLoading)
               IgnorePointer(
                 child: Container(
@@ -225,7 +222,6 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
                 ),
               ),
 
-            // Error message
             if (_errorMessage != null)
               Center(
                 child: Padding(
@@ -273,7 +269,6 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
                 ),
               ),
 
-            // Loading indicator
             if (_isLoading)
               Center(
                 child: Column(
@@ -291,10 +286,8 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
     );
   }
 
-  // Download PDF to device
   Future<void> _downloadPdf() async {
     try {
-      // Request storage permission
       final status = await Permission.storage.request();
       if (!status.isGranted) {
         if (mounted) {
@@ -307,27 +300,22 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
         return;
       }
 
-      // Show loading
       if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('Downloading PDF...')));
       }
 
-      // Download the file
       final response = await http.get(Uri.parse(widget.pdfUrl));
       if (response.statusCode == 200) {
-        // Get downloads directory
         final dir = await getExternalStorageDirectory();
         final downloadsPath = '${dir!.path}/Download';
         final downloadsDir = Directory(downloadsPath);
 
-        // Create directory if it doesn't exist
         if (!await downloadsDir.exists()) {
           await downloadsDir.create(recursive: true);
         }
 
-        // Save file
         final fileName = widget.pdfUrl.split('/').last;
         final file = File('$downloadsPath/$fileName');
         await file.writeAsBytes(response.bodyBytes);
@@ -354,7 +342,6 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
     }
   }
 
-  // Show appearance settings bottom sheet
   void _showAppearanceSettings() {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -383,7 +370,6 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Drag Handle
                   Container(
                     width: 40.w,
                     height: 4.h,
@@ -396,7 +382,6 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
                     ),
                   ),
 
-                  // Title
                   Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: 20.w,
@@ -449,13 +434,11 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
                         : Colors.grey.shade200,
                   ),
 
-                  // Settings
                   Padding(
                     padding: EdgeInsets.all(20.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Night Mode Toggle
                         _buildSettingRow(
                           icon: Icons.dark_mode_rounded,
                           title: 'Night Mode',
@@ -474,7 +457,6 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
 
                         SizedBox(height: 20.h),
 
-                        // Brightness Slider
                         _buildSliderSetting(
                           icon: Icons.brightness_6_rounded,
                           title: 'Brightness',
@@ -491,7 +473,6 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
 
                         SizedBox(height: 20.h),
 
-                        // Background Color
                         Text(
                           'Background Color',
                           style: TextStyle(
@@ -547,7 +528,6 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
 
                         SizedBox(height: 24.h),
 
-                        // Reset Button
                         SizedBox(
                           width: double.infinity,
                           child: OutlinedButton(
@@ -762,7 +742,6 @@ class _PastPaperPdfViewerScreenState extends State<PastPaperPdfViewerScreen> {
     );
   }
 
-  // Open PDF in external browser
   Future<void> _openInBrowser() async {
     try {
       final uri = Uri.parse(widget.pdfUrl);

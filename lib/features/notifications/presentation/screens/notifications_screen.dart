@@ -26,7 +26,6 @@ class NotificationsScreen extends StatefulWidget {
 enum NotificationFilterType { all, unread, mentions, system }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  // Local state to simulate data management for UI demo
   final ApiService _apiService = ApiService();
   bool _isLoading = false;
   List<NotificationModel> _notifications =
@@ -179,7 +178,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   List<NotificationModel> get _filteredNotifications {
-    // 1. First filter by Type
     List<NotificationModel> listByType;
     switch (_currentFilter) {
       case NotificationFilterType.unread:
@@ -215,7 +213,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         break;
     }
 
-    // 2. Then filter by Date if selected
     if (_selectedDate != null) {
       return listByType.where((n) {
         return n.createdAt.year == _selectedDate!.year &&
@@ -249,8 +246,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       setState(() {
         _selectedDate = picked;
       });
-      // Keep sheet open so user can see the filter applied
-      // Navigator.pop(context);
     }
   }
 
@@ -399,7 +394,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         (notification.type == NotificationType.postLike ||
             notification.type == NotificationType.postReply ||
             notification.type == NotificationType.newFollower)) {
-      // For newFollower, sticking to post if ID exists for now.
       if (notification.type != NotificationType.newFollower) {
         return PostDetailScreen(postId: notification.targetContentId!);
       }
@@ -423,10 +417,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Avatar placeholder
                   CircleAvatar(radius: 20.r, backgroundColor: Colors.white),
                   SizedBox(width: 12.w),
-                  // Content placeholder
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -482,7 +474,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         color: theme.primaryColor,
         child: CustomScrollView(
           slivers: [
-            // Dynamic App Bar
             SliverAppBar(
               expandedHeight: 120.h,
               floating: false,
@@ -582,7 +573,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ),
                 ],
               ],
-              // Update Leading to handle selection mode close button color
               leading: _isSelectionMode
                   ? IconButton(
                       icon: const Icon(Icons.close, color: Colors.white),
@@ -596,7 +586,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   : null,
             ),
 
-            // Content
             if (_isLoading && _notifications.isEmpty)
               _buildShimmerList(theme)
             else if (_filteredNotifications.isEmpty)
@@ -729,7 +718,6 @@ class _NotificationTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Checkbox or Icon
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
             child: selectionMode
@@ -750,14 +738,12 @@ class _NotificationTile extends StatelessWidget {
 
           if (!selectionMode) SizedBox(width: 12.w),
 
-          // 2. Content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    // Sender Name
                     if (notification.senderName != null) ...[
                       Text(
                         notification.senderName!,
@@ -778,14 +764,12 @@ class _NotificationTile extends StatelessWidget {
                           notification.title,
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            // Use unread style if needed
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
 
-                    // Time and Unread Dot
                     const Spacer(),
                     Text(
                       _formatTime(notification.createdAt),
@@ -808,7 +792,6 @@ class _NotificationTile extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 4.h),
-                // Message Body
                 Text(
                   notification.message,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -818,8 +801,6 @@ class _NotificationTile extends StatelessWidget {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
-
-                // Optional: Action Buttons or Content Preview below can be added here
               ],
             ),
           ),
@@ -836,7 +817,6 @@ class _NotificationTile extends StatelessWidget {
       );
     }
 
-    // Icon based avatar
     Color iconColor;
     IconData icon;
 

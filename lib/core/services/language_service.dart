@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// 🌍 LanguageService handles app localization state and persistence.
-/// It allows switching between English, Sinhala, and Tamil dynamically
-/// without restarting the app.
 class LanguageService with ChangeNotifier {
   static const String _languageCodeKey = 'languageCode';
   Locale _locale = const Locale('en'); // Default to English
@@ -14,7 +11,6 @@ class LanguageService with ChangeNotifier {
     _loadLocale(); // Automatically load saved locale on service creation
   }
 
-  /// 🔹 Loads saved locale from persistent storage
   Future<void> _loadLocale() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -29,10 +25,8 @@ class LanguageService with ChangeNotifier {
     }
   }
 
-  /// 🔹 Public method for main.dart (used before runApp)
   Future<void> loadLocale() async => await _loadLocale();
 
-  /// 🔹 Updates and persists a new locale
   Future<void> setLocale(String languageCode) async {
     if (languageCode.isEmpty) {
       return;
@@ -49,7 +43,6 @@ class LanguageService with ChangeNotifier {
     }
   }
 
-  /// 🔹 Optionally reset to default (English)
   Future<void> resetToDefault() async {
     _locale = const Locale('en');
     notifyListeners();

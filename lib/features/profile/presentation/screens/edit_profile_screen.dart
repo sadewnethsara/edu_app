@@ -24,7 +24,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool _isLoading = true;
   bool _isSaving = false;
 
-  // Privacy settings
   bool _isProfilePublic = true;
   bool _allowMessagesFromEveryone = true;
   bool _showOnlineStatus = true;
@@ -165,7 +164,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Profile Information Section
                     Text(
                       'Profile Information',
                       style: theme.textTheme.titleLarge?.copyWith(
@@ -174,7 +172,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: 16.h),
 
-                    // Display Name Field
                     TextFormField(
                       controller: _displayNameController,
                       decoration: InputDecoration(
@@ -201,7 +198,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: 16.h),
 
-                    // Bio Field
                     TextFormField(
                       controller: _bioController,
                       maxLines: 4,
@@ -222,7 +218,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: 16.h),
 
-                    // Personal Details Section
                     Text(
                       'Personal Details',
                       style: theme.textTheme.titleLarge?.copyWith(
@@ -231,7 +226,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: 16.h),
 
-                    // Province Field
                     TextFormField(
                       controller: _provinceController,
                       decoration: InputDecoration(
@@ -248,7 +242,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: 16.h),
 
-                    // District Field
                     TextFormField(
                       controller: _districtController,
                       decoration: InputDecoration(
@@ -265,7 +258,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: 16.h),
 
-                    // City Field
                     TextFormField(
                       controller: _cityController,
                       decoration: InputDecoration(
@@ -282,7 +274,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: 16.h),
 
-                    // Gender Dropdown
                     DropdownButtonFormField<String>(
                       value: _selectedGender,
                       decoration: InputDecoration(
@@ -309,7 +300,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: 32.h),
 
-                    // Privacy Settings Section
                     Text(
                       'Privacy Settings',
                       style: theme.textTheme.titleLarge?.copyWith(
@@ -325,7 +315,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: 16.h),
 
-                    // Privacy Settings Cards
                     _buildPrivacyCard(
                       theme,
                       icon: EvaIcons.globe_outline,
@@ -374,7 +363,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: 32.h),
 
-                    // Account Management Section
                     Text(
                       'Account Management',
                       style: theme.textTheme.titleLarge?.copyWith(
@@ -389,7 +377,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       title: 'Blocked Users',
                       subtitle: 'Manage blocked accounts',
                       onTap: () {
-                        // Navigate to blocked users screen
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Blocked users feature coming soon'),
@@ -405,7 +392,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       title: 'Privacy Policy',
                       subtitle: 'View our privacy policy',
                       onTap: () {
-                        // Navigate to privacy policy
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Privacy policy feature coming soon'),

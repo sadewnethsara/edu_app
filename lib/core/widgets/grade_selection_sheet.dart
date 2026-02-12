@@ -110,7 +110,6 @@ class _GradeSelectionSheetState extends State<GradeSelectionSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Drag Handle
             Center(
               child: Container(
                 width: 40.w,
@@ -125,7 +124,6 @@ class _GradeSelectionSheetState extends State<GradeSelectionSheet> {
               ),
             ),
 
-            // Header Section
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
               child: Column(

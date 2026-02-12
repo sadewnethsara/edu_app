@@ -81,13 +81,11 @@ class _CommunitySelectionScreenState extends State<CommunitySelectionScreen> {
     final user = context.read<AuthService>().user;
     if (user == null) return;
 
-    // Check if member
     final isMember = await _communityService.isMember(community.id, user.uid);
     if (!context.mounted) return;
     if (isMember) {
       context.pop(community);
     } else {
-      // Prompt to join
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -109,7 +107,6 @@ class _CommunitySelectionScreenState extends State<CommunitySelectionScreen> {
       if (confirmed == true && mounted) {
         try {
           await _communityService.joinCommunity(community.id, user.uid);
-          // Wait, if it requires approval, status will be pending
           final updatedMember = await _communityService.getMember(
             community.id,
             user.uid,

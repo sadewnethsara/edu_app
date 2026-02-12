@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_auth/firebase_auth.dart'; // Removed
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -42,7 +41,6 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Listen for language changes
     final currentLanguage = context
         .watch<LanguageService>()
         .locale
@@ -59,16 +57,13 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
         '🔍 SubjectsScreen: Fetching for gradeId=${widget.gradeId}, language=$_selectedLanguage, forceRefresh=$forceRefresh',
       );
 
-      // Parallelize fetching Grade Name and Subjects
       final results = await Future.wait([
-        // 1. Fetch Grade Name
         FirebaseFirestore.instance
             .collection('curricula')
             .doc(_selectedLanguage)
             .collection('grades')
             .doc(widget.gradeId)
             .get(),
-        // 2. Fetch Subjects
         _apiService.getSubjects(
           widget.gradeId,
           _selectedLanguage,
@@ -162,7 +157,6 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
-              // ... existing slivers ...
               UnifiedSliverAppBar(
                 title: 'Subjects',
                 isLoading: _isLoading,
@@ -185,7 +179,6 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                 },
               ),
 
-              // Search Bar
               SliverToBoxAdapter(
                 child: _isLoading
                     ? const SearchBarShimmer()
@@ -197,7 +190,6 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                       ),
               ),
 
-              // Content
               _isLoading
                   ? const ContentListShimmer(itemHeight: 80)
                   : _filteredSubjects.isEmpty

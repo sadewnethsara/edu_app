@@ -57,19 +57,16 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        // Save to Firestore
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'preferences': {'language': _selectedLanguage},
         }, SetOptions(merge: true));
       }
 
-      // Update app language - this will refresh the UI automatically
       if (mounted) {
         await context.read<LanguageService>().setLocale(_selectedLanguage!);
 
         if (!mounted) return;
 
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -81,7 +78,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
           ),
         );
 
-        // Go back to previous screen (or home if this is first time)
         if (context.canPop()) {
           context.pop();
         } else {
@@ -123,7 +119,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
               : Column(
                   children: [
                     SizedBox(height: 40.h),
-                    // Header
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 24.w),
                       child: Column(
@@ -153,7 +148,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
                       ),
                     ),
                     SizedBox(height: 40.h),
-                    // Language Cards
                     Expanded(
                       child: ListView.builder(
                         padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -178,7 +172,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
                         },
                       ),
                     ),
-                    // Continue Button
                     Padding(
                       padding: EdgeInsets.all(24.w),
                       child: AnimatedOpacity(
@@ -295,7 +288,6 @@ class _LanguageCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // Icon
                 Container(
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
@@ -313,7 +305,6 @@ class _LanguageCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 16.w),
-                // Text
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,7 +328,6 @@ class _LanguageCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Check Icon
                 if (isSelected)
                   Icon(
                     Icons.check_circle_rounded,

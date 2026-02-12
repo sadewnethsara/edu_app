@@ -1,4 +1,3 @@
-/// Past paper model for exams
 class PastPaperModel {
   final String id;
   final String gradeId;
@@ -7,9 +6,9 @@ class PastPaperModel {
   final String? term;
   final String title;
   final String description;
-  final String fileUrl; // Main paper URL (replaces paperUrl)
+  final String fileUrl;
   final String? answerUrl;
-  final int? fileSize; // <-- This is an int?
+  final int? fileSize;
   final String language;
   final String uploadedAt;
   final bool isActive;
@@ -33,7 +32,6 @@ class PastPaperModel {
   });
 
   factory PastPaperModel.fromJson(Map<String, dynamic> json) {
-    // Handle year as both int and string
     final yearValue = json['year'];
     final yearString = yearValue is int
         ? yearValue.toString()
@@ -47,18 +45,15 @@ class PastPaperModel {
       term: json['term']?.toString(),
       title: json['title']?.toString() ?? 'Unknown',
       description: json['description']?.toString() ?? '',
-      // Support both fileUrl (new) and paperUrl (legacy)
       fileUrl: (json['fileUrl'] ?? json['paperUrl'])?.toString() ?? '',
       answerUrl: json['answerUrl']?.toString(),
 
-      // ✅ CORRECTED: Use .toInt() to match the int? type
       fileSize: (json['fileSize'] is num
           ? (json['fileSize'] as num).toInt()
           : null),
 
       language: json['language']?.toString() ?? 'english',
       uploadedAt: json['uploadedAt']?.toString() ?? '',
-      // ✅ FIXED: Handle both bool and bool? from Firestore
       isActive: (json['isActive'] == true || json['isActive'] == null)
           ? true
           : false,
@@ -85,6 +80,5 @@ class PastPaperModel {
     };
   }
 
-  // Helper getter for backward compatibility
   String get paperUrl => fileUrl;
 }

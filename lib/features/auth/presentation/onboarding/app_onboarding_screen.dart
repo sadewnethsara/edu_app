@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 
 import 'package:math/core/widgets/styled_button.dart';
 
-// Import all necessary pages
 import 'pages/age_page.dart';
 import 'pages/connect_account_page.dart';
 import 'pages/create_password_page.dart';
@@ -39,7 +38,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
   final _loginPasswordController =
       TextEditingController(); // For login bottom sheet
 
-  // --- State Variables ---
   String? _selectedAppLanguage;
   String? _selectedLearningMedium;
   List<String> _selectedGrades = [];
@@ -56,7 +54,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
   String _password = '';
   String _confirmPassword = '';
 
-  // --- Error Flags ---
   bool _showLangError = false;
   bool _showMediumError = false;
   bool _showCityError = false;
@@ -107,7 +104,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     );
   }
 
-  // --- Helper to show errors ---
   void _showErrorSnackBar(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -123,7 +119,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     );
   }
 
-  // --- NEW: Helper to show success toast/popup ---
   void _showSuccessToast(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -146,7 +141,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     );
   }
 
-  // --- Save + Complete Onboarding ---
   Future<void> _saveOnboardingData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -170,20 +164,16 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     final authService = context.read<AuthService>();
     await _saveOnboardingData();
 
-    // Manually trigger upload since the auth state might have changed
-    // before onboardingComplete was set to true (common for Google flow)
     if (authService.user != null) {
       await authService.uploadOnboardingData(authService.user!);
     }
 
-    // We just need to navigate. Delay slightly for confetti/toast.
     await Future.delayed(const Duration(milliseconds: 500));
     if (mounted) {
       context.go(AppRouter.homePath);
     }
   }
 
-  // --- Validation Helper ---
   void _triggerHapticsAndError(VoidCallback toggleErrorFlag) {
     logger.w("Validation error on page $_currentPage");
     HapticFeedback.heavyImpact();
@@ -193,52 +183,42 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     });
   }
 
-  // --- Page Navigation & Logic ---
   Future<void> _nextPage() async {
     logger.d("Next button pressed on page $_currentPage");
     final authService = context.read<AuthService>();
 
-    // --- HIDE KEYBOARD ---
     FocusScope.of(context).unfocus();
 
     bool blockNavigation = false;
 
-    // --- Page 0: Language ---
     if (_currentPage == 0 && _selectedAppLanguage == null) {
       _triggerHapticsAndError(() => _showLangError = true);
       blockNavigation = true;
     }
-    // --- Page 1: Medium ---
     if (_currentPage == 1 && _selectedLearningMedium == null) {
       _triggerHapticsAndError(() => _showMediumError = true);
       blockNavigation = true;
     }
-    // --- Page 3: Location ---
     if (_currentPage == 3 && _city == null) {
       _triggerHapticsAndError(() => _showCityError = true);
       blockNavigation = true;
     }
-    // --- Page 4: Gender ---
     if (_currentPage == 4 && _selectedGender == null) {
       _triggerHapticsAndError(() => _showGenderError = true);
       blockNavigation = true;
     }
-    // --- Page 5: Age ---
     if (_currentPage == 5 && _selectedAge == null) {
       _triggerHapticsAndError(() => _showAgeError = true);
       blockNavigation = true;
     }
-    // --- Page 6: Name ---
     if (_currentPage == 6 &&
         (_firstName.trim().isEmpty || _lastName.trim().isEmpty)) {
       _triggerHapticsAndError(() => _showNameError = true);
       blockNavigation = true;
     }
 
-    // --- Page 7: Connect Account (Email/Phone) OR Google Phone ---
     if (_currentPage == 7) {
       if (_isGoogleRegistration) {
-        // --- GOOGLE MODE: Only validate phone ---
         if (_mobile.trim().length < 9) {
           _triggerHapticsAndError(() => _showConnectError = true);
           blockNavigation = true;
@@ -249,7 +229,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
           try {
             await authService.sendOtpToPhone(context, fullPhoneNumber);
             setState(() => _isContinueLoading = false);
-            // Navigation proceeds to Page 8 (OTP)
           } catch (e) {
             setState(() => _isContinueLoading = false);
             _showErrorSnackBar(e.toString());
@@ -257,7 +236,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
           }
         }
       } else {
-        // --- NORMAL MODE: Validate Email and Phone ---
         final isEmailInvalid = !RegExp(
           r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
         ).hasMatch(_email);
@@ -266,7 +244,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
           _triggerHapticsAndError(() => _showConnectError = true);
           blockNavigation = true;
         } else {
-          // Validation passed, check if user exists
           if (!mounted) return;
           setState(() => _isContinueLoading = true);
 
@@ -280,7 +257,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
           setState(() => _isContinueLoading = false);
 
           if (emailExists || phoneExists) {
-            // USER EXISTS: Show login bottom sheet
             logger.i("Email or phone exists, prompting for login.");
             _showLoginBottomSheet(
               context,
@@ -289,11 +265,9 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
             );
             blockNavigation = true; // Stop navigation
           } else {
-            // USER IS NEW: Send OTP
             logger.i("New user, sending OTP.");
             try {
               await authService.sendOtpToPhone(context, fullPhoneNumber);
-              // Success, navigation will proceed
             } catch (e) {
               _showErrorSnackBar(e.toString());
               blockNavigation = true; // Stop navigation on OTP fail
@@ -302,15 +276,12 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
         }
       }
     }
-    // --- End of Page 6 Logic ---
 
-    // --- Page 8: OTP ---
     if (_currentPage == 8) {
       if (_otpCode.length < 6) {
         _triggerHapticsAndError(() => _showOtpError = true);
         blockNavigation = true;
       } else if (_isGoogleRegistration) {
-        // --- GOOGLE MODE: Verify OTP and Finish ---
         if (!mounted) return;
         setState(() => _isContinueLoading = true);
         final error = await authService.signUpWithGoogleAndPhone(
@@ -325,7 +296,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
         } else {
           _confettiController.play();
           _showSuccessToast("Welcome! Your account is created.");
-          // Skip password page, go to finish
           _pageController.animateToPage(
             10,
             duration: const Duration(milliseconds: 300),
@@ -335,7 +305,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
         }
       }
     }
-    // --- Page 9: Create Password ---
     if (_currentPage == 9) {
       final isPasswordInvalid =
           _password.length < 6 || _password != _confirmPassword;
@@ -343,7 +312,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
         _triggerHapticsAndError(() => _showPasswordError = true);
         blockNavigation = true;
       } else {
-        // --- FINAL SIGN UP ---
         if (!mounted) return;
         setState(() => _isContinueLoading = true);
         final error = await authService.signUpWithEmailPasswordAndLinkPhone(
@@ -365,10 +333,8 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
           }
           blockNavigation = true;
         } else {
-          // Success! Play confetti, show toast, and complete onboarding
           _confettiController.play();
           _showSuccessToast("Welcome! Your account is created.");
-          // Wait a moment for confetti then complete onboarding
           await Future.delayed(const Duration(milliseconds: 800));
           if (mounted) {
             await _completeOnboarding();
@@ -379,15 +345,12 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
       }
     }
 
-    // --- Page 10: Login Prompt (FINISH) ---
     if (_currentPage == 10) {
       _confettiController.play();
       _showSuccessToast("You're all set!");
       await _completeOnboarding();
-      // Don't block navigation, _completeOnboarding will handle it
     }
 
-    // --- Page Navigation ---
     if (!blockNavigation && _currentPage < 10) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 400),
@@ -408,7 +371,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      // Go back to welcome screen (use replace to avoid stack issues)
       if (mounted) {
         context.go(AppRouter.welcomePath);
       }
@@ -420,7 +382,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     setState(() => _isGoogleLoading = true);
     final authService = context.read<AuthService>();
 
-    // Save onboarding data to SharedPreferences before Google sign-in
     await _saveOnboardingToPrefs();
 
     final error = await authService.signInWithGoogle();
@@ -428,8 +389,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     setState(() => _isGoogleLoading = false);
 
     if (error == "USER_NOT_FOUND") {
-      // New Google user - continue with account creation
-      // Swap to GooglePhonePage on the SAME page index (Index 7)
       setState(() {
         _isGoogleRegistration = true;
       });
@@ -437,17 +396,14 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     } else if (error != null) {
       _showErrorSnackBar(error);
     } else {
-      // Success! Existing user signed in
       _showSuccessToast("Welcome back!");
       context.go(AppRouter.homePath);
     }
   }
 
-  // Save onboarding data to SharedPreferences
   Future<void> _saveOnboardingToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Save all collected data
     if (_selectedAppLanguage != null) {
       await prefs.setString('onboard_language', _selectedAppLanguage!);
     }
@@ -493,7 +449,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     try {
       final fullPhoneNumber = "+94${_mobile.trim()}"; // ADJUST COUNTRY CODE
       await authService.sendOtpToPhone(context, fullPhoneNumber);
-      // Show success
       if (mounted) {
         _showSuccessToast('A new code has been sent.');
       }
@@ -502,7 +457,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     }
   }
 
-  // --- UPDATED LOGIN BOTTOM SHEET ---
   void _showLoginBottomSheet(
     BuildContext context,
     String identifier,
@@ -516,7 +470,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     _loginPasswordController.clear(); // Clear password on open
     _otpCode = ''; // Clear OTP
 
-    // --- Define the handler function INSIDE the method ---
     Future<void> handleEmailLogin(StateSetter setSheetState) async {
       final authService = context.read<AuthService>();
       setSheetState(() {
@@ -530,14 +483,12 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
       );
 
       if (error == null) {
-        // SUCCESS!
         if (!context.mounted) return;
         Navigator.of(context).pop(); // Close bottom sheet
         _confettiController.play();
         _showSuccessToast("Welcome back!");
         await _completeOnboarding(); // Save data and go home
       } else {
-        // FAILURE
         setSheetState(() {
           isLoading = false;
           errorText = "Wrong password. Please try again.";
@@ -563,14 +514,12 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
       final error = await authService.signInWithPhoneOtp(_otpCode);
 
       if (error == null) {
-        // SUCCESS!
         if (!context.mounted) return;
         Navigator.of(context).pop(); // Close bottom sheet
         _confettiController.play();
         _showSuccessToast("Welcome back!");
         await _completeOnboarding(); // Save data and go home
       } else {
-        // FAILURE
         setSheetState(() {
           isLoading = false;
           errorText = error;
@@ -604,10 +553,7 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
 
     Future<void> handleUseAnotherNumber(StateSetter setSheetState) async {
       Navigator.of(context).pop(); // Close bottom sheet
-      // User wants to continue with a different number
-      // Let them continue with the onboarding flow normally
     }
-    // --- End of handler functions ---
 
     showModalBottomSheet(
       context: context,
@@ -643,7 +589,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
                   ),
                   SizedBox(height: 24.h),
 
-                  // Email login - show password field
                   if (isEmail) ...[
                     TextField(
                       controller: _loginPasswordController,
@@ -673,7 +618,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
                     ),
                   ],
 
-                  // Phone login - show OTP options
                   if (!isEmail) ...[
                     if (errorText != null)
                       Padding(
@@ -728,16 +672,11 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     );
   }
 
-  // --- REMOVED: This function's logic is now inside _showLoginBottomSheet ---
-  // Future<void> _handleLoginFromBottomSheet(...) async { ... }
-
-  // --- Handle Android back button ---
   Future<bool> _handleWillPop() async {
     if (_currentPage > 0) {
       await _prevPage();
       return false; // prevent screen from closing
     } else {
-      // Allow going back to welcome screen
       if (mounted) {
         context.go(AppRouter.welcomePath);
       }
@@ -750,27 +689,23 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
     final theme = Theme.of(context);
 
     final pages = [
-      // 0
       LanguagePage(
         onLanguageSelected: (lang) {
           if (mounted) setState(() => _selectedAppLanguage = lang);
         },
         showError: _showLangError,
       ),
-      // 1
       MediumSelectionPage(
         onMediumSelected: (m) {
           if (mounted) setState(() => _selectedLearningMedium = m);
         },
         showError: _showMediumError,
       ),
-      // 2
       GradeSelectionPage(
         onGradesSelected: (g) {
           if (mounted) setState(() => _selectedGrades = g);
         },
       ),
-      // 3
       LocationPage(
         onProvinceSelected: (p) {
           if (mounted) setState(() => _province = p);
@@ -783,21 +718,18 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
         },
         showError: _showCityError,
       ),
-      // 4
       GenderPage(
         onGenderSelected: (g) {
           if (mounted) setState(() => _selectedGender = g);
         },
         showError: _showGenderError,
       ),
-      // 5
       AgePage(
         onAgeSelected: (a) {
           if (mounted) setState(() => _selectedAge = a);
         },
         showError: _showAgeError,
       ),
-      // 6
       NameInputPage(
         onFirstNameChanged: (v) {
           if (mounted) setState(() => _firstName = v);
@@ -807,7 +739,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
         },
         showNameError: _showNameError,
       ),
-      // 7
       _isGoogleRegistration
           ? GooglePhonePage(
               onMobileChanged: (v) {
@@ -826,7 +757,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
               showError: _showConnectError,
               isGoogleLoading: _isGoogleLoading,
             ),
-      // 8
       OnboardingOtpPage(
         phoneNumber: _mobile,
         onOtpChanged: (otp) {
@@ -835,7 +765,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
         showError: _showOtpError,
         onResendTapped: _handleResendOtp,
       ),
-      // 9
       CreatePasswordPage(
         onPasswordChanged: (v) {
           if (mounted) setState(() => _password = v);
@@ -845,14 +774,12 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
         },
         showError: _showPasswordError,
       ),
-      // 10
       LoginPromptPage(onLoginPrompt: _completeOnboarding),
     ];
 
     final totalPages = pages.length;
     final totalProgressSteps = totalPages - 1; // 9 steps (0-8)
 
-    // --- Validation logic for Continue button ---
     bool isContinueDisabled = false;
     if (_currentPage == 0 && _selectedAppLanguage == null) {
       isContinueDisabled = true;
@@ -916,7 +843,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
         body: SafeArea(
           child: Column(
             children: [
-              // Progress Bar (hides on last page)
               if (_currentPage < totalPages - 1)
                 Padding(
                   padding: EdgeInsets.symmetric(
@@ -933,7 +859,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
                   ),
                 ),
 
-              // Main Page Content
               Expanded(
                 child: PageView.builder(
                   controller: _pageController,
@@ -948,9 +873,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
                 ),
               ),
 
-              // Continue / Finish Button
-              // Hides on Page 7 (Connect Account) because that page
-              // has its own internal buttons (Google / Continue)
               Container(
                 decoration: BoxDecoration(
                   color: theme.scaffoldBackgroundColor,
@@ -976,7 +898,6 @@ class _AppOnboardingScreenState extends State<AppOnboardingScreen> {
                   ),
                 ),
               ),
-              // Confetti
               Align(
                 alignment: Alignment.topCenter,
                 child: ConfettiWidget(

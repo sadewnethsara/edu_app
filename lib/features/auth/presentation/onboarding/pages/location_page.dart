@@ -9,11 +9,9 @@ class LocationPage extends StatefulWidget {
   final ValueChanged<String?> onCitySelected;
   final bool showError;
 
-  // 🚀 --- ADDED INITIAL VALUES --- 🚀
   final String? initialProvince;
   final String? initialDistrict;
   final String? initialCity;
-  // 🚀 --- END OF ADDED VALUES --- 🚀
 
   const LocationPage({
     super.key,
@@ -21,7 +19,6 @@ class LocationPage extends StatefulWidget {
     required this.onDistrictSelected,
     required this.onCitySelected,
     required this.showError,
-    // 🚀 ADDED TO CONSTRUCTOR
     this.initialProvince,
     this.initialDistrict,
     this.initialCity,
@@ -41,11 +38,9 @@ class _LocationPageState extends State<LocationPage> {
   List<String> _districts = [];
   List<String> _cities = [];
 
-  // 🚀 --- UPDATED INITSTATE --- 🚀
   @override
   void initState() {
     super.initState();
-    // Pre-fill the form if initial data is provided
     if (widget.initialProvince != null) {
       _province = widget.initialProvince;
       _districts = data.getDistricts(_province!);
@@ -62,9 +57,7 @@ class _LocationPageState extends State<LocationPage> {
       }
     }
   }
-  // 🚀 --- END OF UPDATE --- 🚀
 
-  // Resets all location selections
   void _resetSelection() {
     setState(() {
       _province = null;
@@ -73,13 +66,11 @@ class _LocationPageState extends State<LocationPage> {
       _districts = [];
       _cities = [];
     });
-    // Notify parent widget (AppOnboardingScreen) that values are reset to null
     widget.onProvinceSelected(null);
     widget.onDistrictSelected(null);
     widget.onCitySelected(null);
   }
 
-  // Helper to determine the currently active list
   List<String> _getActiveList(String step) {
     switch (step) {
       case 'Province':
@@ -93,7 +84,6 @@ class _LocationPageState extends State<LocationPage> {
     }
   }
 
-  // Common handler for selection changes
   void _handleSelection(String step, String? value) {
     if (step == 'Province') {
       setState(() {
@@ -137,7 +127,6 @@ class _LocationPageState extends State<LocationPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. Icon and Heading
           Center(
             child: AnimatedEmoji(
               AnimatedEmojis.camping,
@@ -156,7 +145,6 @@ class _LocationPageState extends State<LocationPage> {
           ),
           SizedBox(height: 8.h),
 
-          // --- Description and Reset Button Row ---
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -190,7 +178,6 @@ class _LocationPageState extends State<LocationPage> {
           ),
           SizedBox(height: 30.h),
 
-          // --- Sequential Location Steps ---
           _buildLocationSelector(
             context,
             'Province',
@@ -225,7 +212,6 @@ class _LocationPageState extends State<LocationPage> {
             ),
           ],
 
-          // 4. Error Message
           if (isError)
             Padding(
               padding: EdgeInsets.only(top: 16.h),
@@ -244,7 +230,6 @@ class _LocationPageState extends State<LocationPage> {
     );
   }
 
-  // --- 🎨 UPDATED: Location Selector Widget (Handles Active/Completed State) ---
   Widget _buildLocationSelector(
     BuildContext context,
     String label,
@@ -259,7 +244,6 @@ class _LocationPageState extends State<LocationPage> {
     final textTheme = theme.textTheme;
     final isCompleted = value != null;
 
-    // 1. Completed State (Match App Language Card Style)
     if (isCompleted) {
       Color tileBorderColor = colorScheme.primary;
       double borderWidth = 3.w;
@@ -326,7 +310,6 @@ class _LocationPageState extends State<LocationPage> {
       );
     }
 
-    // 2. Active Selection State (Chips/Tiles)
     if (isActive) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,7 +339,6 @@ class _LocationPageState extends State<LocationPage> {
     return const SizedBox.shrink();
   }
 
-  // --- Chip Builder Method ---
   Widget _buildLocationChip({
     required String label,
     required VoidCallback onSelect,

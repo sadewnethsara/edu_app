@@ -15,7 +15,6 @@ class StreakDialog extends StatelessWidget {
         final int streakCount = streakService.currentStreak;
         final int previousStreak = streakService.previousStreak;
 
-        // --- Compute week days ---
         final Set<int> weekLoginDays = {};
         final today = DateTime.now();
         final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
@@ -59,7 +58,6 @@ class StreakDialog extends StatelessWidget {
               ),
               child: Stack(
                 children: [
-                  // 🔥 Centered Content (No Scroll)
                   Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(
@@ -69,7 +67,6 @@ class StreakDialog extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Fire Icon
                           FadeInDown(
                             duration: const Duration(milliseconds: 400),
                             child: Container(
@@ -105,7 +102,6 @@ class StreakDialog extends StatelessWidget {
 
                           SizedBox(height: 16.h),
 
-                          // Title
                           FadeInUp(
                             duration: const Duration(milliseconds: 400),
                             child: Text(
@@ -123,7 +119,6 @@ class StreakDialog extends StatelessWidget {
 
                           SizedBox(height: 12.h),
 
-                          // Streak Counter
                           ZoomIn(
                             duration: const Duration(milliseconds: 500),
                             child: Container(
@@ -177,7 +172,6 @@ class StreakDialog extends StatelessWidget {
 
                           SizedBox(height: 24.h),
 
-                          // Week Tracker
                           FadeInUp(
                             duration: const Duration(milliseconds: 400),
                             child: Container(
@@ -206,7 +200,6 @@ class StreakDialog extends StatelessWidget {
 
                           SizedBox(height: 24.h),
 
-                          // Message
                           FadeInUp(
                             duration: const Duration(milliseconds: 400),
                             delay: const Duration(milliseconds: 100),
@@ -225,7 +218,6 @@ class StreakDialog extends StatelessWidget {
 
                           SizedBox(height: 28.h),
 
-                          // CTA Button
                           FadeInUp(
                             duration: const Duration(milliseconds: 400),
                             delay: const Duration(milliseconds: 200),
@@ -285,7 +277,6 @@ class StreakDialog extends StatelessWidget {
                     ),
                   ),
 
-                  // Close Button (Top Right)
                   Positioned(
                     top: 20.h,
                     right: 16.w,
@@ -311,7 +302,6 @@ class StreakDialog extends StatelessWidget {
     );
   }
 
-  // ✅ Week Tracker Row
   Widget _buildWeekTracker(Set<int> weekLoginDays) {
     final List<String> weekDays = ["M", "T", "W", "T", "F", "S", "S"];
     final int todayWeekday = DateTime.now().weekday;

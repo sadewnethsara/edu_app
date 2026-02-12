@@ -1,7 +1,3 @@
-// 🚀 CORE EXPORTS
-// This file exports the most commonly used core components, models, and services.
-
-// --- MODELS ---
 export 'package:math/core/models/user_model.dart';
 export 'package:math/core/models/post_model.dart';
 export 'package:math/core/models/reply_model.dart';
@@ -16,7 +12,6 @@ export 'package:math/core/models/live_event_model.dart';
 export 'package:math/core/models/language_model.dart';
 export 'package:math/core/models/feedback_model.dart';
 
-// --- SERVICES ---
 export 'package:math/core/services/auth_service.dart';
 export 'package:math/core/services/logger_service.dart';
 export 'package:math/core/services/api_service.dart';
@@ -31,11 +26,9 @@ export 'package:math/core/services/language_service.dart';
 export 'package:math/core/services/media_service.dart';
 export 'package:math/core/services/device_service.dart';
 
-// --- WIDGETS ---
 export 'package:math/core/widgets/styled_button.dart';
 export 'package:math/core/widgets/main_scaffold.dart';
 export 'package:math/core/widgets/offline_banner.dart';
 
-// --- THEME & ROUTER ---
 export 'package:math/core/theme/app_theme.dart';
 export 'package:math/core/router/app_router.dart';

@@ -63,11 +63,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   List<AssetEntity> _imageAssets = [];
   final ReplyPermission _replyPermission = ReplyPermission.everyone;
 
-  // 🚀 URL Detection State
   String? _detectedUrl;
   String? _attachedLink;
 
-  // 🚀 Enhanced Community Fields
   String? _selectedSubjectId;
   String? _selectedSubjectName;
   List<SubjectModel> _availableSubjects = [];
@@ -75,12 +73,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   List<Map<String, dynamic>> _tagSuggestions = [];
   PostCategory _postCategory = PostCategory.general;
 
-  // 🚀 Community Fields
   String? _selectedCommunityId;
   String? _selectedCommunityName;
   String? _selectedCommunityIcon;
 
-  // Poll State
   bool _isPollActive = false;
   final List<TextEditingController> _pollOptions = [
     TextEditingController(),
@@ -92,7 +88,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   bool _sharingDisabled = false;
   bool _resharingDisabled = false;
 
-  // 🚀 User Tagging Suggestions
   List<UserModel> _userSuggestions = [];
   final List<String> _taggedUserIds = [];
   final List<String> _taggedUserNames = [];
@@ -140,7 +135,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   void _updateState() {
-    // URL Detection
     final RegExp urlRegex = RegExp(
       r'((https?:\/\/)|(www\.))[^\s]+',
       caseSensitive: false,
@@ -154,7 +148,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       });
     }
 
-    // --- Mention Detection ---
     final text = _textController.text;
     final selection = _textController.selection;
 
@@ -210,7 +203,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     final hasText = _textController.text.trim().isNotEmpty;
     final hasImages = _imageAssets.isNotEmpty;
 
-    // If poll is active, we MUST have text (question) AND at least 2 valid options
     if (_isPollActive) {
       final validOptions = _pollOptions
           .where((c) => c.text.trim().isNotEmpty)
@@ -222,12 +214,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   Future<void> _pickImages() async {
-    // ... Simplified permission handling
     PermissionStatus status;
     if (Platform.isAndroid) {
       final androidInfo = await DeviceInfoPlugin().androidInfo;
       if (androidInfo.version.sdkInt >= 33) {
-        // Request both photos and videos
         final statuses = await [Permission.photos, Permission.videos].request();
         status =
             statuses[Permission.photos] == PermissionStatus.granted &&
@@ -385,7 +375,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           return;
         }
 
-        // Use selected expiration or default to 7 days for polls if not set
         final durationDays = _expirationDays ?? 7;
 
         pollData = PollData(
@@ -400,14 +389,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         );
       }
 
-      // 🚀 Fetch User Profile for filtering metadata
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .get();
       final userData = userDoc.data();
 
-      // 🚀 Check for Ban Status
       final bool isBanned = userData?['isBanned'] as bool? ?? false;
       if (isBanned) {
         final Timestamp? banExpiresAt = userData?['banExpiresAt'] as Timestamp?;
@@ -480,7 +467,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         mentionedNames: _taggedUserNames,
       );
 
-      // --- Community Post Approval Logic ---
       PostStatus postStatus = PostStatus.approved;
       CommunityModel? selectedCommunity;
       if (_selectedCommunityId != null) {
@@ -496,7 +482,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           postStatus = PostStatus.draft;
         } else if (selectedCommunity != null &&
             selectedCommunity.requiresPostApproval) {
-          // Check if user is admin/owner
           final bool isAdmin =
               member != null &&
               (member.role == CommunityRole.admin ||
@@ -511,7 +496,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
       final finalPost = newPost.copyWith(status: postStatus);
 
-      // --- Admin Notification for Pending Posts ---
       if (postStatus == PostStatus.pending && selectedCommunity != null) {
         await SocialService().sendNotification(
           toUserId: selectedCommunity.creatorId,
@@ -524,9 +508,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         );
       }
 
-      // 3. Create Post & Handle Repost Logic
       await FirebaseFirestore.instance.runTransaction((transaction) async {
-        // A. If it's a repost, increment the original post's reShareCount
         if (finalPost.originalPostId != null) {
           final originalPostRef = FirebaseFirestore.instance
               .collection('posts')
@@ -537,18 +519,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           });
         }
 
-        // B. Create the new post
         transaction.set(postDoc, finalPost.toJson());
       });
 
-      // C. Update Tag Counts (Outside Transaction)
       for (final tag in finalPost.tags) {
         await SocialService().updateTagCount(tag, 1);
       }
 
-      // 4. Send Notification if Repost (Outside Transaction)
       if (finalPost.originalPostId != null && finalPost.originalPost != null) {
-        // Don't notify self
         if (finalPost.originalPost!.authorId != user.uid) {
           await SocialService().sendNotification(
             toUserId: finalPost.originalPost!.authorId,
@@ -639,7 +617,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Author & Community
           Row(
             children: [
               SizedBox(
@@ -647,7 +624,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 height: 32.r,
                 child: Stack(
                   children: [
-                    // User Photo
                     Align(
                       alignment: post.communityId != null
                           ? Alignment.bottomRight
@@ -673,7 +649,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                             : null,
                       ),
                     ),
-                    // Community Icon
                     if (post.communityId != null)
                       Positioned(
                         top: 0,
@@ -726,7 +701,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             ],
           ),
 
-          // 🚀 Category, Subject, Tags Row
           if (post.subjectId != null ||
               post.category != PostCategory.general ||
               post.tags.isNotEmpty)
@@ -816,7 +790,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               ),
             ),
 
-          // 🚀 Helpful Answer Indicator
           if (post.helpfulAnswerCount > 0)
             Padding(
               padding: EdgeInsets.only(top: 8.h),
@@ -847,7 +820,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               ),
             ),
 
-          // Poll Summary
           if (post.pollData != null)
             Container(
               margin: EdgeInsets.only(top: 8.h),
@@ -910,7 +882,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               ),
             ),
 
-          // Quoted Media Preview
           if (post.imageUrls.isNotEmpty ||
               post.imageUrl != null ||
               post.videoUrl != null)
@@ -1257,7 +1228,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Avatar
                     Padding(
                       padding: EdgeInsets.only(top: 8.h),
                       child: CircleAvatar(
@@ -1272,12 +1242,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     ),
                     SizedBox(width: 12.w),
 
-                    // Input Area
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Reply constraint button (e.g. "Everyone")
                           if (_replyPermission != ReplyPermission.everyone)
                             Padding(
                               padding: EdgeInsets.only(bottom: 8.h),
@@ -1329,7 +1297,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                               child: _buildImageGrid(),
                             ),
 
-                          // 🚀 Poll UI
                           if (_isPollActive)
                             Padding(
                               padding: EdgeInsets.only(top: 16.h),
@@ -1507,7 +1474,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                                         ],
                                       ),
                                     ),
-                                    // Close button to remove poll
                                     Positioned(
                                       top: 8,
                                       right: 8,
@@ -1529,10 +1495,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                               ),
                             ),
 
-                          // 🚀 Attached Link Preview
                           _buildAttachedLink(theme),
 
-                          // Quote Preview (Re-post)
                           if (widget.quotedPost != null)
                             Padding(
                               padding: EdgeInsets.only(top: 24.h, bottom: 16.h),
@@ -1546,7 +1510,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               ),
             ),
 
-            // --- Tags Section ---
             if (isKeyboardVisible && _tags.isNotEmpty)
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 0.h),
@@ -1575,16 +1538,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 ),
               ),
 
-            // --- Community Selection Bar ---
             _buildCommunitySelector(theme),
 
-            // 🚀 URL Tooltip (Floats above bottom section)
             _buildUrlTooltip(theme),
 
-            // 🚀 User Suggestions for @mentions
             _buildUserSuggestions(theme),
 
-            // Dynamic Bottom Section
             _buildBottomSection(theme),
           ],
         ),
@@ -1653,7 +1612,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   void _showTagInput() {
-    // Initial load of popular tags
     SocialService().getPopularTags().then((tags) {
       if (mounted) setState(() => _tagSuggestions = tags);
     });
@@ -1852,7 +1810,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         _tagController.clear();
         _tagSuggestions = [];
       });
-      // Refresh popular tags for next use
       SocialService().getPopularTags().then((tags) {
         setDialogState(() => _tagSuggestions = tags);
       });
@@ -1946,7 +1903,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       );
     }
 
-    // Keyboard Closed: Two Rows
     return Container(
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
@@ -1958,7 +1914,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Row 1: Category & Subject
           Row(
             children: [
               Expanded(
@@ -1985,7 +1940,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             ],
           ),
           SizedBox(height: 12.h),
-          // Row 2: Image, Poll, Timer, Settings
           Row(
             children: [
               Expanded(
@@ -2153,16 +2107,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     double height = 250.h;
     Radius r = Radius.circular(12.r);
 
-    // 1 Image
     if (count == 1) {
       return SizedBox(
         height: height,
         width: double.infinity,
         child: _buildGridImage(0, BorderRadius.all(r)),
       );
-    }
-    // 2 Images
-    else if (count == 2) {
+    } else if (count == 2) {
       return SizedBox(
         height: height,
         child: Row(
@@ -2177,9 +2128,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           ],
         ),
       );
-    }
-    // 3 Images
-    else if (count == 3) {
+    } else if (count == 3) {
       return SizedBox(
         height: height,
         child: Row(
@@ -2207,9 +2156,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           ],
         ),
       );
-    }
-    // 4 Images
-    else {
+    } else {
       return SizedBox(
         height: height,
         child: Column(
@@ -2259,7 +2206,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       children: [
         GestureDetector(
           onTap: () {
-            // Create list of providers
             final providers = _imageAssets
                 .map((e) => AssetEntityImageProvider(e, isOriginal: true))
                 .toList();

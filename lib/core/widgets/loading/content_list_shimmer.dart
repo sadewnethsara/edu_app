@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 
-/// Reusable shimmer for list items
 class ContentListShimmer extends StatelessWidget {
   final int itemCount;
   final double itemHeight;

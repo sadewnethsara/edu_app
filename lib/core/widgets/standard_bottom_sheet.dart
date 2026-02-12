@@ -62,7 +62,6 @@ class StandardBottomSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Drag Handle
             if (showDragHandle)
               Center(
                 child: Container(
@@ -78,7 +77,6 @@ class StandardBottomSheet extends StatelessWidget {
                 ),
               ),
 
-            // Header (Title Row)
             if (title != null)
               Padding(
                 padding: EdgeInsets.fromLTRB(20.w, 4.h, 12.w, 4.h),
@@ -117,7 +115,6 @@ class StandardBottomSheet extends StatelessWidget {
                     : Colors.grey.shade200,
               ),
 
-            // Content
             if (isContentScrollable)
               Flexible(
                 child: showScrollbar

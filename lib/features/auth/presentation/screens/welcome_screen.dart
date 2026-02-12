@@ -8,7 +8,6 @@ import 'package:math/core/router/app_router.dart';
 import 'package:math/core/widgets/styled_button.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  // Renamed to WelcomeScreen
   const WelcomeScreen({super.key});
 
   @override
@@ -85,7 +84,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 SizedBox(height: 10.h),
                 Text(
                   "Unlock Your Math Potential",
-                  // CHANGED: Use headlineLarge from your theme
                   style: theme.textTheme.headlineLarge?.copyWith(
                     fontSize: 32.sp,
                   ),
@@ -112,10 +110,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // CHANGED: To FilledButton to match your theme
               StyledButton(
                 onPressed: () {
-                  // ADDED: Navigation
                   context.push(AppRouter.onboardingPath);
                 },
                 text: "GET STARTED",
@@ -130,7 +126,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   minimumSize: Size.fromHeight(56.h),
                   foregroundColor: theme.colorScheme.primary, // Use theme color
                   shape: RoundedRectangleBorder(
-                    // 9. Use responsive radius
                     borderRadius: BorderRadius.circular(15.r),
                     side: BorderSide(
                       color: theme.colorScheme.outline.withValues(alpha: 0.5),

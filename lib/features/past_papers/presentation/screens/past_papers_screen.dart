@@ -141,7 +141,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
             logger.i('Auto-selected first grade: $_selectedGrade');
             _loadPastPapers(_selectedGrade!);
           } else {
-            // If no grades, stop loading
             setState(() => _isLoading = false);
           }
         });
@@ -186,7 +185,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
       if (mounted) {
         setState(() {
           _papers = papers;
-          // Extract unique years
           _years = papers.map((p) => p.year.toString()).toSet().toList()
             ..sort((a, b) => b.compareTo(a)); // Newest first
           _isLoading = false;
@@ -200,7 +198,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
     }
   }
 
-  // 🚀 UPDATED: Filter logic now includes search, sorting, and advanced filters
   List<PastPaperModel> get _filteredPapers {
     List<PastPaperModel> papers = _papers;
 
@@ -211,18 +208,12 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
     }
 
     if (_selectedPaperType != 'All') {
-      // Assuming 'type' is a field in PastPaperModel or we filter by title convention if not exist
-      // Since PastPaperModel might not have 'type', check if title contains it or ignore if not supported
-      // If PastPaperModel has a type field:
-      // papers = papers.where((p) => p.type == _selectedPaperType).toList();
-      // If not, we rely on title matching:
       papers = papers
           .where((paper) => paper.title.contains(_selectedPaperType))
           .toList();
     }
 
     if (_selectedTerm != 'All') {
-      // Similarly for term, assuming it's in title if not a field
       papers = papers
           .where(
             (paper) =>
@@ -238,7 +229,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
           .toList();
     }
 
-    // Apply sorting
     if (_sortOrder == 'Newest') {
       papers.sort((a, b) => b.year.compareTo(a.year));
     } else if (_sortOrder == 'Oldest') {
@@ -256,7 +246,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
     return papers;
   }
 
-  // Open PDF in-app
   void _openPdfInApp(String pdfUrl, String title) {
     if (pdfUrl.isEmpty) {
       ScaffoldMessenger.of(
@@ -274,7 +263,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
     );
   }
 
-  // 🚀 NEW: Bottom Sheet for Paper Actions
   void _showPaperActionModal(PastPaperModel paper) {
     showModalBottomSheet(
       context: context,
@@ -302,9 +290,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // App Bar
-          // App Bar
-          // Custom Header for Past Papers
           SliverAppBar(
             expandedHeight: 140.h,
             floating: false,
@@ -367,7 +352,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
                 ),
                 child: Stack(
                   children: [
-                    // Decorative Icon
                     Positioned(
                       right: -20,
                       bottom: -20,
@@ -377,7 +361,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
                         color: Colors.white.withValues(alpha: 0.1),
                       ),
                     ),
-                    // Vertical Grade Indicator on LEFT
                     Positioned(
                       left: 20.w,
                       bottom: 16.h,
@@ -385,7 +368,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          // Vertical Grade Text
                           RotatedBox(
                             quarterTurns: 3,
                             child: Text(
@@ -414,7 +396,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
                             ),
                           ),
                           SizedBox(width: 8.w),
-                          // Vertical Line
                           Container(
                             width: 2,
                             height: 32.h,
@@ -428,6 +409,7 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
               ),
             ),
           ),
+
           /* UnifiedSliverAppBar(
             title: 'Past Papers',
             isLoading: _isLoading,
@@ -459,12 +441,8 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
               setState(() {
                 _sortOrder = value;
               });
-              // Trigger sort logic if needed, e.g. re-sort list
-              // Assuming _papers are sorted in build or elsewhere based on _sortOrder
             },
           ), */
-
-          // Search Bar
           SliverToBoxAdapter(
             child: SearchBarWidget(
               hintText: 'Search papers by title...',
@@ -482,7 +460,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
             ),
           ),
 
-          // Active Filters
           if (_selectedYear != null)
             SliverToBoxAdapter(
               child: Padding(
@@ -502,7 +479,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
               ),
             ),
 
-          // Content
           _isLoading
               ? _buildShimmerList()
               : finalFilteredPapers.isEmpty
@@ -547,7 +523,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
                       final paper = finalFilteredPapers[index];
                       return Padding(
                         padding: EdgeInsets.only(bottom: 16.h),
-                        // 🚀 UPDATED: Call modal on tap
                         child: _PastPaperCard(
                           paper: paper,
                           onTap: () => _showPaperActionModal(paper),
@@ -627,8 +602,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
     );
   }
 
-  // 🚀 --- NEW SHIMMER WIDGETS --- 🚀
-
   Widget _buildShimmerPlaceholder({
     double? width,
     required double height,
@@ -703,10 +676,6 @@ class _PastPapersScreenState extends State<PastPapersScreen> {
   }
 }
 
-// --- FILTER CHIP WIDGET ---
-
-// 🚀 --- NEW REDESIGNED CARD WIDGET --- 🚀
-
 class _PastPaperCard extends StatelessWidget {
   final PastPaperModel paper;
   final VoidCallback onTap; // 🚀 Use this for the modal
@@ -723,7 +692,6 @@ class _PastPaperCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(16.r),
       child: Container(
         decoration: BoxDecoration(
-          // 🚀 UPDATED: Dark mode visible color
           color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
@@ -743,7 +711,6 @@ class _PastPaperCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Left Visual
             Container(
               width: 80.w,
               height: 120.h,
@@ -760,14 +727,12 @@ class _PastPaperCard extends StatelessWidget {
                 size: 32.sp,
               ),
             ),
-            // Right Content
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(12.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title
                     Text(
                       paper.title,
                       style: theme.textTheme.titleMedium?.copyWith(
@@ -777,7 +742,6 @@ class _PastPaperCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 4.h),
-                    // Year & Term
                     Row(
                       children: [
                         Icon(
@@ -806,7 +770,6 @@ class _PastPaperCard extends StatelessWidget {
                       ],
                     ),
                     SizedBox(height: 8.h),
-                    // Description
                     Text(
                       paper.description.isEmpty
                           ? 'No description available.'
@@ -821,7 +784,6 @@ class _PastPaperCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    // Tags (if available)
                     if (paper.tags != null && paper.tags!.isNotEmpty) ...[
                       SizedBox(height: 10.h),
                       Wrap(
@@ -864,8 +826,6 @@ class _PastPaperCard extends StatelessWidget {
   }
 }
 
-// 🚀 --- NEW MODAL WIDGET --- 🚀
-
 class _PaperActionModal extends StatelessWidget {
   final PastPaperModel paper;
   final VoidCallback onOpenPaper;
@@ -890,7 +850,6 @@ class _PaperActionModal extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Subtitle
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 20.w,
@@ -919,12 +878,10 @@ class _PaperActionModal extends StatelessWidget {
                 : Colors.grey.shade200,
           ),
 
-          // Action Buttons
           Padding(
             padding: EdgeInsets.all(20.w),
             child: Column(
               children: [
-                // "Open Paper" Button
                 _buildActionButton(
                   context: context,
                   onPressed: onOpenPaper,
@@ -937,7 +894,6 @@ class _PaperActionModal extends StatelessWidget {
 
                 SizedBox(height: 12.h),
 
-                // "Open Answers" Button
                 _buildActionButton(
                   context: context,
                   onPressed: hasAnswers ? onOpenAnswers : null,

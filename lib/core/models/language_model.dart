@@ -1,4 +1,3 @@
-/// Language model representing available app languages
 class LanguageModel {
   final String code;
   final String label;
@@ -19,7 +18,6 @@ class LanguageModel {
       code: json['code'] as String,
       label: json['label'] as String,
       nativeName: json['nativeName'] as String,
-      // ✅ FIXED: Handle both bool and bool? from Firestore
       isActive: (json['isActive'] == true || json['isActive'] == null)
           ? true
           : false,

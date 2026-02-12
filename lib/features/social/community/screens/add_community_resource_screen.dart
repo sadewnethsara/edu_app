@@ -77,7 +77,6 @@ class _AddCommunityResourceScreenState
       String finalUrl = _urlController.text.trim();
 
       if (_selectedFile != null) {
-        // Simple progress simulation or actual progress if supported
         final uploadedUrl = await _communityService.uploadResourceFile(
           communityId: widget.communityId,
           resourceId: DateTime.now().millisecondsSinceEpoch

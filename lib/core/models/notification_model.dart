@@ -24,7 +24,6 @@ class NotificationModel {
   final bool isRead;
   final NotificationType type;
 
-  // New Fields for Social interactions
   final String? senderId;
   final String? senderName;
   final String? senderPhotoUrl;

@@ -51,14 +51,12 @@ class CacheService {
     final keysToDelete = [];
     final keepDays = getKeepDuration();
 
-    // 0 means keep forever
     if (keepDays == 0) return;
 
     for (var key in box.keys) {
       final entry = Map<String, dynamic>.from(box.get(key));
       final cachedAt = DateTime.parse(entry['cachedAt']);
       if (now.difference(cachedAt).inDays >= keepDays) {
-        // Delete files
         final localPaths = List<String>.from(entry['localPaths']);
         for (var path in localPaths) {
           final file = File(path);

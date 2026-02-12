@@ -39,7 +39,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
   bool _isLoading = true;
   String _selectedLanguage = 'en';
 
-  // State Variables
   int _totalLessonsCount = 0;
   int _totalPoints = 0;
   double _completionPercent = 0.0;
@@ -233,7 +232,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
     );
   }
 
-  // --- LIVE EVENTS SECTION ---
   Widget _buildLiveEventsSection(ThemeData theme, bool isDark) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance

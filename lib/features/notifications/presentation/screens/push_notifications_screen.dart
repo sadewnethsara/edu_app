@@ -11,21 +11,15 @@ class PushNotificationsScreen extends StatefulWidget {
 }
 
 class _PushNotificationsScreenState extends State<PushNotificationsScreen> {
-  // Master toggle
   bool _pauseAll = false;
 
-  // Interaction toggles
   bool _relatedToYou_Likes = true;
   bool _relatedToYou_Reposts = true;
   bool _relatedToYou_Quotes = true;
 
-  // From user request: "push notification it inside it on off all"
-  // and "app color change like that images in dark mode"
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Dark mode check for color logic if needed, currently reusing theme
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -45,7 +39,6 @@ class _PushNotificationsScreenState extends State<PushNotificationsScreen> {
       ),
       body: ListView(
         children: [
-          // Master Toggle
           SwitchListTile(
             value: _pauseAll,
             onChanged: (val) => setState(() => _pauseAll = val),

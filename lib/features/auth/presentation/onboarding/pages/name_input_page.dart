@@ -7,17 +7,14 @@ class NameInputPage extends StatefulWidget {
   final ValueChanged<String> onLastNameChanged;
   final bool showNameError;
 
-  // 🚀 --- ADDED INITIAL VALUES --- 🚀
   final String? initialFirstName;
   final String? initialLastName;
-  // 🚀 --- END OF ADDED VALUES --- 🚀
 
   const NameInputPage({
     super.key,
     required this.onFirstNameChanged,
     required this.onLastNameChanged,
     required this.showNameError,
-    // 🚀 ADDED TO CONSTRUCTOR
     this.initialFirstName,
     this.initialLastName,
   });
@@ -30,23 +27,18 @@ class _NameInputPageState extends State<NameInputPage> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
 
-  // 🚀 --- UPDATED INITSTATE --- 🚀
   @override
   void initState() {
     super.initState();
-    // Pre-fill the text fields if initial data is provided
     if (widget.initialFirstName != null) {
       _firstNameController.text = widget.initialFirstName!;
-      // Notify the parent once at the start
       widget.onFirstNameChanged(widget.initialFirstName!);
     }
     if (widget.initialLastName != null) {
       _lastNameController.text = widget.initialLastName!;
-      // Notify the parent once at the start
       widget.onLastNameChanged(widget.initialLastName!);
     }
   }
-  // 🚀 --- END OF UPDATE --- 🚀
 
   @override
   void dispose() {
@@ -55,10 +47,8 @@ class _NameInputPageState extends State<NameInputPage> {
     super.dispose();
   }
 
-  // 🎨 --- REDESIGNED BUILD METHOD --- 🎨
   @override
   Widget build(BuildContext context) {
-    // Get theme properties
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -69,7 +59,6 @@ class _NameInputPageState extends State<NameInputPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. Title and Subtitle
           Text(
             "What should we call you?",
             style: textTheme.headlineMedium?.copyWith(
@@ -89,7 +78,6 @@ class _NameInputPageState extends State<NameInputPage> {
           ),
           SizedBox(height: 32.h),
 
-          // 2. Thematic Emoji
           Center(
             child: AnimatedEmoji(
               AnimatedEmojis
@@ -100,7 +88,6 @@ class _NameInputPageState extends State<NameInputPage> {
           ),
           SizedBox(height: 24.h),
 
-          // 3. Name Input Fields (Side-by-Side)
           Row(
             crossAxisAlignment:
                 CrossAxisAlignment.start, // Align fields if one has an error
@@ -130,14 +117,11 @@ class _NameInputPageState extends State<NameInputPage> {
               ),
             ],
           ),
-
-          // 4. Removed the old error message from here
         ],
       ),
     );
   }
 
-  // 🎨 --- UPDATED HELPER METHOD --- 🎨
   Widget _buildTextField(
     BuildContext context, {
     required TextEditingController controller,
@@ -146,7 +130,6 @@ class _NameInputPageState extends State<NameInputPage> {
     required bool isError,
     required String? errorMessage, // New parameter for inline error
   }) {
-    // Get theme properties
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -172,7 +155,6 @@ class _NameInputPageState extends State<NameInputPage> {
         filled: inputTheme.filled,
         fillColor: inputTheme.fillColor,
 
-        // Use errorText to show inline errors
         errorText: isError ? errorMessage : null,
         errorStyle: TextStyle(
           fontSize: 12.sp,
@@ -180,10 +162,8 @@ class _NameInputPageState extends State<NameInputPage> {
           height: 1.2,
         ),
 
-        // --- BORDER STYLES ---
         border: inputTheme.border,
 
-        // Standard border
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(
@@ -192,19 +172,16 @@ class _NameInputPageState extends State<NameInputPage> {
           ),
         ),
 
-        // Focused border (no error)
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: focusedBorderColor, width: 3.0.w),
         ),
 
-        // Error border (not focused)
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: colorScheme.error, width: 2.0.w),
         ),
 
-        // Error border (when focused)
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: colorScheme.error, width: 3.0.w),

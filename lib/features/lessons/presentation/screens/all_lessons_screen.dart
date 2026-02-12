@@ -1,14 +1,12 @@
 import 'dart:ui'; // For BackdropFilter
 import 'package:flutter/material.dart';
 
-// Firebase & 3rd Party
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:icons_plus/icons_plus.dart';
 
-// App Exports
 import 'package:math/app_exports.dart';
 import 'package:math/l10n/app_localizations.dart';
 
@@ -20,20 +18,16 @@ class AllLessonsScreen extends StatefulWidget {
 }
 
 class _AllLessonsScreenState extends State<AllLessonsScreen> {
-  // --- STATE & CORE LOGIC ---
-
   final ApiService _apiService = ApiService();
 
   bool _isLoading = true;
   String _selectedLanguage = 'en';
   List<String> _userGradeIds = [];
 
-  // Data structure: Map<GradeId, Map<SubjectId, List<Lessons>>>
   Map<String, Map<String, List<LessonModel>>> _lessonsData = {};
   Map<String, GradeModel> _gradesMap = {};
   Map<String, SubjectModel> _subjectsMap = {};
 
-  // Caching maps
   final Map<String, Future<ContentCollection?>> _lessonContentFutures = {};
   final Map<String, Future<List<SubtopicModel>>> _subtopicFutures = {};
   final Map<String, Future<ContentCollection?>> _subtopicContentFutures = {};
@@ -216,8 +210,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
     return count;
   }
 
-  // --- MODAL & NAVIGATION ---
-
   Future<void> _launchExternalUrl(String url) async {
     final Uri uri = Uri.parse(url);
     if (!await canLaunchUrl(uri)) {
@@ -339,8 +331,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
     );
   }
 
-  // --- MAIN BUILD METHOD ---
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -350,14 +340,12 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        // 🚀 SafeArea fix
         top: false,
         bottom: true,
         child: RefreshIndicator(
           onRefresh: _onRefresh,
           child: CustomScrollView(
             slivers: [
-              // Modern App Bar
               SliverAppBar(
                 expandedHeight: 120.h,
                 floating: false,
@@ -427,7 +415,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
                 ],
               ),
 
-              // Content
               if (_isLoading)
                 _buildShimmerLoading()
               else if (_userGradeIds.isEmpty)
@@ -462,8 +449,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
       ),
     );
   }
-
-  // --- EMPTY & LOADED STATES ---
 
   Widget _buildEmptyState(
     String title,
@@ -512,7 +497,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
       padding: EdgeInsets.all(16.w),
       sliver: SliverList(
         delegate: SliverChildListDelegate([
-          // Glassmorphism Summary Card
           ClipRRect(
             borderRadius: BorderRadius.circular(20.r),
             child: BackdropFilter(
@@ -591,15 +575,12 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
           ),
           SizedBox(height: 32.h),
 
-          // Lessons by Grade
           ..._buildLessonsByGrade(theme, AppLocalizations.of(context)!),
           SizedBox(height: 80.h), // Bottom padding
         ]),
       ),
     );
   }
-
-  // --- SHIMMER WIDGETS ---
 
   Widget _buildShimmerPlaceholder({
     double? width,
@@ -620,7 +601,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // Define shimmer colors explicitly for visibility
     final baseColor = isDark ? Colors.grey[900]! : Colors.grey[300]!;
     final highlightColor = isDark ? Colors.grey[800]! : Colors.grey[100]!;
 
@@ -688,7 +668,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Grade Header Shimmer
         Padding(
           padding: EdgeInsets.only(left: 8.w, bottom: 16.h),
           child: Row(
@@ -727,7 +706,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
       ),
       child: Column(
         children: [
-          // Subject Header
           Container(
             padding: EdgeInsets.all(20.w),
             decoration: BoxDecoration(
@@ -757,7 +735,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
               ],
             ),
           ),
-          // Fake Lesson Items
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             child: Column(
@@ -806,8 +783,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
   }
 
   /* Removed detailed shimmer tiles for cleaner loading state */
-
-  // --- DATA BUILD WIDGETS ---
 
   List<Widget> _buildLessonsByGrade(ThemeData theme, AppLocalizations l10n) {
     List<Widget> widgets = [];
@@ -894,7 +869,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
         borderRadius: BorderRadius.circular(24.r),
         child: Column(
           children: [
-            // Subject Header
             Container(
               padding: EdgeInsets.all(20.w),
               decoration: BoxDecoration(
@@ -957,7 +931,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
               ),
             ),
 
-            // Lessons List
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -1005,7 +978,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
       ),
       collapsedBackgroundColor: Colors.transparent,
 
-      // Leading Icon (Number)
       leading: Container(
         width: 36.w,
         height: 36.w,
@@ -1025,13 +997,11 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
         ),
       ),
 
-      // Title
       title: Text(
         lesson.name,
         style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
       ),
 
-      // Description (Subtitle)
       subtitle: lesson.description.isEmpty && !hasContent
           ? null
           : Column(
@@ -1735,7 +1705,6 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
   }
 } // End of _AllLessonsScreenState
 
-// --- MODAL WIDGET ---
 class _ContentActionModal extends StatelessWidget {
   final ContentItem item;
   final String contentType;
@@ -1817,7 +1786,6 @@ class _ContentActionModal extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Thumbnail for video
               if (contentType == 'videos')
                 Container(
                   width: double.infinity,
@@ -1869,7 +1837,6 @@ class _ContentActionModal extends StatelessWidget {
                   ),
                 ),
 
-              // Content Info
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1908,7 +1875,6 @@ class _ContentActionModal extends StatelessWidget {
               ),
               SizedBox(height: 32.h),
 
-              // Action Button
               ElevatedButton.icon(
                 onPressed: onPressed,
                 icon: Icon(icon),

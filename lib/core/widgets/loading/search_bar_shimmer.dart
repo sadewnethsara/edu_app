@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 
-/// Reusable shimmer placeholder for search bars
 class SearchBarShimmer extends StatelessWidget {
   const SearchBarShimmer({super.key});
 

@@ -65,7 +65,6 @@ class ModernDeleteDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Warning Icon
             Container(
               padding: EdgeInsets.all(16.r),
               decoration: BoxDecoration(
@@ -76,7 +75,6 @@ class ModernDeleteDialog extends StatelessWidget {
             ),
             SizedBox(height: 20.h),
 
-            // Text Content
             Text(
               title,
               style: theme.textTheme.headlineSmall?.copyWith(
@@ -96,7 +94,6 @@ class ModernDeleteDialog extends StatelessWidget {
             ),
             SizedBox(height: 32.h),
 
-            // Actions
             Row(
               children: [
                 Expanded(

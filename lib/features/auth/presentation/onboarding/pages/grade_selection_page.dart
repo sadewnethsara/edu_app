@@ -35,7 +35,6 @@ class _GradeSelectionPageState extends State<GradeSelectionPage> {
 
   Future<void> _loadGrades() async {
     try {
-      // Fetch grades for the selected language medium
       final grades = await _apiService.getGrades(_selectedLanguage);
 
       if (grades.isNotEmpty) {
@@ -46,7 +45,6 @@ class _GradeSelectionPageState extends State<GradeSelectionPage> {
         });
       } else {
         if (!mounted) return;
-        // If no active grades found, use defaults
         setState(() {
           _grades = _getDefaultGrades();
           _isLoading = false;
@@ -92,7 +90,6 @@ class _GradeSelectionPageState extends State<GradeSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Get theme properties
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -103,7 +100,6 @@ class _GradeSelectionPageState extends State<GradeSelectionPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. Icon and Heading
           Center(
             child: AnimatedEmoji(
               AnimatedEmojis.bee,
@@ -131,7 +127,6 @@ class _GradeSelectionPageState extends State<GradeSelectionPage> {
           ),
           SizedBox(height: 40.h),
 
-          // --- Select Grades Section ---
           Text(
             "Select your grade of focus",
             style: textTheme.bodyLarge?.copyWith(
@@ -141,7 +136,6 @@ class _GradeSelectionPageState extends State<GradeSelectionPage> {
           ),
           SizedBox(height: 12.h),
 
-          // Loading shimmer or grade chips
           if (_isLoading)
             Wrap(
               spacing: 10.w,
@@ -176,7 +170,6 @@ class _GradeSelectionPageState extends State<GradeSelectionPage> {
     );
   }
 
-  // Shimmer loading chip
   Widget _buildShimmerChip() {
     final theme = Theme.of(context);
 
@@ -195,7 +188,6 @@ class _GradeSelectionPageState extends State<GradeSelectionPage> {
   }
 }
 
-// --- Custom Widget for Grade Chips (Duolingo Style Chip, Theme-Aware) ---
 class DuolingoGradeChip extends StatelessWidget {
   final String label;
   final bool isSelected;
@@ -210,7 +202,6 @@ class DuolingoGradeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get theme properties
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;

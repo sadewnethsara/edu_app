@@ -51,7 +51,6 @@ class _ConnectAccountPageState extends State<ConnectAccountPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // --- ✨ Header ---
                 Text(
                   "Create your account",
                   style: textTheme.headlineMedium?.copyWith(
@@ -70,7 +69,6 @@ class _ConnectAccountPageState extends State<ConnectAccountPage> {
                 ),
                 SizedBox(height: 32.h),
 
-                // --- ✨ Glass Card ---
                 ClipRRect(
                   borderRadius: BorderRadius.circular(20.r),
                   child: BackdropFilter(
@@ -86,13 +84,11 @@ class _ConnectAccountPageState extends State<ConnectAccountPage> {
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
                         transitionBuilder: (child, animation) {
-                          // Slide in from the right
                           final offsetAnimation = Tween<Offset>(
                             begin: const Offset(1.0, 0.0),
                             end: Offset.zero,
                           ).animate(animation);
 
-                          // Fade in
                           return FadeTransition(
                             opacity: animation,
                             child: SlideTransition(
@@ -105,7 +101,6 @@ class _ConnectAccountPageState extends State<ConnectAccountPage> {
                           padding: EdgeInsets.all(16.w),
                           child: Column(
                             children: [
-                              // --- Email ---
                               TextFormField(
                                 controller: _emailController,
                                 onChanged: widget.onEmailChanged,
@@ -136,7 +131,6 @@ class _ConnectAccountPageState extends State<ConnectAccountPage> {
                               ),
                               SizedBox(height: 20.h),
 
-                              // --- Phone ---
                               TextFormField(
                                 controller: _mobileController,
                                 onChanged: widget.onMobileChanged,
@@ -195,7 +189,6 @@ class _ConnectAccountPageState extends State<ConnectAccountPage> {
 
                 SizedBox(height: 24.h),
 
-                // --- Divider ---
                 Row(
                   children: [
                     Expanded(child: Divider(color: colorScheme.outlineVariant)),
@@ -214,7 +207,6 @@ class _ConnectAccountPageState extends State<ConnectAccountPage> {
 
                 SizedBox(height: 24.h),
 
-                // --- ✨ Google Button (looks like text field) ---
                 ClipRRect(
                   borderRadius: BorderRadius.circular(20.r),
                   child: BackdropFilter(
@@ -230,13 +222,11 @@ class _ConnectAccountPageState extends State<ConnectAccountPage> {
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
                         transitionBuilder: (child, animation) {
-                          // Slide in from the right
                           final offsetAnimation = Tween<Offset>(
                             begin: const Offset(1.0, 0.0),
                             end: Offset.zero,
                           ).animate(animation);
 
-                          // Fade in
                           return FadeTransition(
                             opacity: animation,
                             child: SlideTransition(

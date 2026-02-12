@@ -34,14 +34,11 @@ class _AgePageState extends State<AgePage> {
     '21+',
   ];
 
-  // 🚀 --- UPDATED INITSTATE --- 🚀
   @override
   void initState() {
     super.initState();
-    // Pre-fill the selection
     _ageRange = widget.initialAge;
   }
-  // 🚀 --- END OF UPDATE --- 🚀
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +61,6 @@ class _AgePageState extends State<AgePage> {
             ),
           ),
           SizedBox(height: 16.h),
-          // 🧠 Heading
           Text(
             "How old are you?",
             style: textTheme.headlineMedium?.copyWith(
@@ -92,7 +88,6 @@ class _AgePageState extends State<AgePage> {
           ],
           SizedBox(height: 40.h),
 
-          // 🟩 Square Grid Layout
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -113,7 +108,6 @@ class _AgePageState extends State<AgePage> {
     );
   }
 
-  // --- 🧩 Age Card (Square, Animated, Theme-aware) ---
   Widget _buildAgeCard(BuildContext context, String label) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;

@@ -44,7 +44,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
         return;
       }
 
-      // 1. Get current user's full data (for points)
       final userDoc = await _firestore
           .collection('users')
           .doc(currentUser.uid)
@@ -57,7 +56,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       _currentUserModel = UserModel.fromJson(userData);
       final int currentUserPoints = _currentUserModel?.points ?? 0;
 
-      // 2. Fetch leaderboard and rank in parallel
       final results = await Future.wait([
         _apiService.getLeaderboard(),
         _apiService.getUserRank(currentUserPoints),
@@ -89,7 +87,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
         children: [
           CustomScrollView(
             slivers: [
-              // 🚀 UPDATED: App Bar with Theme Style
               SliverAppBar(
                 expandedHeight: 380.h,
                 floating: false,
@@ -133,7 +130,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                     child: Stack(
                       alignment: Alignment.bottomCenter,
                       children: [
-                        // Decorative Background Icon
                         Positioned(
                           right: -40,
                           top: -40,
@@ -144,7 +140,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           ),
                         ),
 
-                        // Podium for Top 3
                         if (!_isLoading && _topUsers.isNotEmpty)
                           Padding(
                             padding: EdgeInsets.only(bottom: 40.h),
@@ -185,7 +180,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                 ),
               ),
 
-              // Title Header
               if (!_isLoading && _topUsers.length > 3)
                 SliverToBoxAdapter(
                   child: Padding(
@@ -238,7 +232,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             ],
           ),
 
-          // User's Floating Rank Card
           if (!_isLoading && _currentUserModel != null)
             Positioned(
               left: 0,
@@ -346,7 +339,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
         ),
         SizedBox(height: 12.h),
 
-        // Podium Block
         Container(
           width: 80.w,
           height: height,
@@ -510,8 +502,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     );
   }
 
-  // --- 🚀 SHIMMER WIDGETS 🚀 ---
-
   Widget _buildShimmerBody(ThemeData theme) {
     final isDark = theme.brightness == Brightness.dark;
     final baseColor = isDark ? Colors.grey.shade900 : Colors.grey.shade300;
@@ -534,7 +524,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               ),
               child: Row(
                 children: [
-                  // Left Box Shimmer
                   Container(
                     width: 60.w,
                     height: 80.h,
@@ -545,7 +534,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                   ),
                   SizedBox(width: 16.w),
 
-                  // Avatar Shimmer
                   Container(
                     width: 40.r,
                     height: 40.r,
@@ -556,7 +544,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                   ),
                   SizedBox(width: 12.w),
 
-                  // Text Shimmer
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -654,7 +641,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       ),
       child: Row(
         children: [
-          // Left Visual: Rank Box
           Container(
             width: 60.w,
             height: 80.h,
@@ -701,7 +687,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
 
           SizedBox(width: 16.w),
 
-          // User Info
           CircleAvatar(
             radius: 20.r,
             backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
@@ -754,7 +739,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             ),
           ),
 
-          // Points
           Padding(
             padding: EdgeInsets.only(right: 16.w),
             child: Column(

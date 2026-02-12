@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// Filter chip for content type filtering
 class ContentFilterChip extends StatelessWidget {
   final String label;
   final bool isSelected;

@@ -8,7 +8,6 @@ class DeviceService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
 
-  /// Gets a map of basic, non-sensitive device info
   Future<Map<String, dynamic>> _getDeviceInfo() async {
     Map<String, dynamic> deviceData = {};
     try {
@@ -36,14 +35,11 @@ class DeviceService {
     return deviceData;
   }
 
-  /// Saves the device info to the user's Firestore document
   Future<void> saveDeviceInfo(User user) async {
     try {
       final deviceInfo = await _getDeviceInfo();
       if (deviceInfo.isEmpty) return; // Failed to get info
 
-      // We will update the 'users' document with info
-      // about the last device that logged in.
       final userDocRef = _firestore.collection('users').doc(user.uid);
 
       await userDocRef.update({
@@ -53,7 +49,6 @@ class DeviceService {
 
       logger.i('Saved device info for ${user.uid}');
     } catch (e, s) {
-      // Don't crash the app if this fails, just log it.
       logger.e(
         'Failed to save device info to Firestore',
         error: e,

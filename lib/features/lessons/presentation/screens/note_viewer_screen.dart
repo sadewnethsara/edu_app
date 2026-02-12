@@ -26,7 +26,6 @@ class _NoteViewerScreenState extends State<NoteViewerScreen> {
   String? _errorMessage;
   bool _isLastItem = false;
 
-  // Cache to store downloaded file paths
   static final Map<String, String> _noteCache = {};
 
   @override
@@ -42,21 +41,17 @@ class _NoteViewerScreenState extends State<NoteViewerScreen> {
     _isLastItem = _currentIndex == widget.itemList.length - 1;
   }
 
-  /// Gets the local file path for a note, downloading it if not in cache.
   Future<String> _getNotePath(String url) async {
-    // 1. Check cache
     if (_noteCache.containsKey(url)) {
       logger.i('Loading note from cache');
       return _noteCache[url]!;
     }
 
-    // 2. Download
     logger.i('Downloading note from: $url');
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final dir = await getTemporaryDirectory();
-      // Use a unique file name
       final file = File('${dir.path}/note_${_currentItem.id}.html');
       await file.writeAsString(response.body); // Save as HTML/text
 
@@ -68,7 +63,6 @@ class _NoteViewerScreenState extends State<NoteViewerScreen> {
     }
   }
 
-  /// Loads the note into the WebView, using the cached file if available.
   Future<void> _loadNote() async {
     setState(() {
       _isLoading = true;
@@ -77,15 +71,10 @@ class _NoteViewerScreenState extends State<NoteViewerScreen> {
     });
 
     try {
-      // 1. Get the local file path (from your cache/download logic)
       final String localPath = await _getNotePath(_currentItem.url);
 
-      // 🚀 --- THIS IS THE FIX --- 🚀
-      // 2. Read the downloaded file into a string
       final String htmlString = await File(localPath).readAsString();
-      // 🚀 --- END OF FIX --- 🚀
 
-      // 3. Initialize the controller
       final controller = WebViewController()
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
         ..setBackgroundColor(const Color(0x00000000))
@@ -109,7 +98,6 @@ class _NoteViewerScreenState extends State<NoteViewerScreen> {
           ),
         );
 
-      // 4. 🚀 Load the HTML string directly
       await controller.loadHtmlString(htmlString);
 
       if (mounted) {
@@ -140,7 +128,6 @@ class _NoteViewerScreenState extends State<NoteViewerScreen> {
 
   void _finishViewing() {
     logger.i('Finished viewing notes.');
-    // Clear the "Continue Learning" bookmark
     Provider.of<ContinueLearningService>(
       context,
       listen: false,
@@ -149,25 +136,21 @@ class _NoteViewerScreenState extends State<NoteViewerScreen> {
   }
 
   void _markAsCompleted() {
-    // 1. Award points
     Provider.of<AuthService>(
       context,
       listen: false,
     ).awardPoints(10); // Example: 10 points
 
-    // 2. Mark as complete in Firestore (for percentage)
     Provider.of<AuthService>(
       context,
       listen: false,
     ).markContentAsCompleted(_currentItem.id);
 
-    // 3. Clear the "Continue Learning" bookmark
     Provider.of<ContinueLearningService>(
       context,
       listen: false,
     ).clearLastViewedItem();
 
-    // 4. Show success message
     logger.i('Marked as completed: ${_currentItem.name}');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -191,7 +174,6 @@ class _NoteViewerScreenState extends State<NoteViewerScreen> {
       ),
       body: Stack(
         children: [
-          // Show error message if loading failed
           if (_errorMessage != null)
             Center(
               child: Padding(
@@ -227,15 +209,12 @@ class _NoteViewerScreenState extends State<NoteViewerScreen> {
               ),
             ),
 
-          // Show WebView only if there's no error and controller is initialized
           if (_errorMessage == null && _controller != null)
             WebViewWidget(controller: _controller!),
 
-          // Show loading indicator
           if (_isLoading) const Center(child: CircularProgressIndicator()),
         ],
       ),
-      // Bottom navigation bar for actions
       bottomNavigationBar: _buildBottomActions(theme),
     );
   }
@@ -259,7 +238,6 @@ class _NoteViewerScreenState extends State<NoteViewerScreen> {
       ),
       child: Row(
         children: [
-          // "Mark as Completed" Button
           Expanded(
             child: OutlinedButton(
               onPressed: _markAsCompleted,
@@ -278,7 +256,6 @@ class _NoteViewerScreenState extends State<NoteViewerScreen> {
           ),
           SizedBox(width: 16.w),
 
-          // "Next" or "Finish" Button
           Expanded(
             child: ElevatedButton(
               onPressed: _isLastItem ? _finishViewing : _goToNextNote,

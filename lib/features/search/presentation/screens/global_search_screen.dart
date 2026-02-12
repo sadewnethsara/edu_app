@@ -33,7 +33,6 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen>
   late TabController _tabController;
   Timer? _debounce;
 
-  // Search States
   List<PostModel> _posts = [];
   List<UserModel> _people = [];
   List<CommunityModel> _communities = [];
@@ -357,8 +356,6 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen>
     );
   }
 
-  // --- Result Builders ---
-
   Widget _buildAllResults(ThemeData theme) {
     if (_searchController.text.isEmpty) return _buildInitialState(theme);
     if (_isLoading) return const Center(child: CircularProgressIndicator());
@@ -499,8 +496,6 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen>
       },
     );
   }
-
-  // --- Sub UI Elements ---
 
   Widget _buildSectionHeader(
     ThemeData theme,

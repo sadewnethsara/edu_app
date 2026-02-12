@@ -90,7 +90,6 @@ class _SubtopicContentScreenState extends State<SubtopicContentScreen> {
         }
       }
 
-      // Fetch grade name
       final gradeDoc = await FirebaseFirestore.instance
           .collection('curricula')
           .doc(_selectedLanguage)
@@ -107,7 +106,6 @@ class _SubtopicContentScreenState extends State<SubtopicContentScreen> {
             'Grade ${widget.gradeId.replaceAll(RegExp(r'[^0-9]'), '')}';
       }
 
-      // Fetch subject name
       DocumentSnapshot subjectDoc = await FirebaseFirestore.instance
           .collection('grades')
           .doc(widget.gradeId)
@@ -133,7 +131,6 @@ class _SubtopicContentScreenState extends State<SubtopicContentScreen> {
         _subjectName = 'Subject';
       }
 
-      // Fetch lesson name
       DocumentSnapshot lessonDoc = await FirebaseFirestore.instance
           .collection('grades')
           .doc(widget.gradeId)
@@ -163,7 +160,6 @@ class _SubtopicContentScreenState extends State<SubtopicContentScreen> {
         _lessonName = 'Lesson';
       }
 
-      // Fetch subtopic name
       DocumentSnapshot subtopicDoc = await FirebaseFirestore.instance
           .collection('grades')
           .doc(widget.gradeId)
@@ -175,7 +171,6 @@ class _SubtopicContentScreenState extends State<SubtopicContentScreen> {
           .doc(widget.subtopicId)
           .get();
 
-      // Fallback to /curricula path
       if (!subtopicDoc.exists) {
         subtopicDoc = await FirebaseFirestore.instance
             .collection('curricula')
@@ -200,7 +195,6 @@ class _SubtopicContentScreenState extends State<SubtopicContentScreen> {
         logger.w('Could not find subtopic name in /grades or /curricula');
       }
 
-      // Fetch subtopic content
       final content = await _apiService.getSubtopicContent(
         widget.gradeId,
         widget.subjectId,
@@ -229,7 +223,6 @@ class _SubtopicContentScreenState extends State<SubtopicContentScreen> {
   void _applySearchAndSort() {
     if (_content == null) return;
 
-    // First, filter by search query
     List<ContentItem> filterList(List<ContentItem> list) {
       if (_searchQuery.isEmpty) {
         return List.from(list);
@@ -242,13 +235,11 @@ class _SubtopicContentScreenState extends State<SubtopicContentScreen> {
           .toList();
     }
 
-    // Create filtered content
     final filteredVideos = filterList(_content!.videos);
     final filteredNotes = filterList(_content!.notes);
     final filteredPdfs = filterList(_content!.contentPdfs);
     final filteredResources = filterList(_content!.resources);
 
-    // Then sort
     void sortList(List<ContentItem> list) {
       switch (_selectedSort) {
         case 'A-Z':
@@ -404,7 +395,6 @@ class _SubtopicContentScreenState extends State<SubtopicContentScreen> {
     );
   }
 
-  // Helper to filter content
   List<Map<String, dynamic>> _getFilteredItems() {
     final contentToUse = _filteredContent ?? _content;
     if (contentToUse == null) return [];
@@ -538,7 +528,6 @@ class _SubtopicContentScreenState extends State<SubtopicContentScreen> {
               },
             ),
 
-            // Search Bar
             SliverToBoxAdapter(
               child: _isLoading
                   ? const SearchBarShimmer()
@@ -550,7 +539,6 @@ class _SubtopicContentScreenState extends State<SubtopicContentScreen> {
                     ),
             ),
 
-            // 🚀 2. Filter Chips (Modern Tabs)
             if (!_isLoading)
               SliverToBoxAdapter(
                 child: Padding(
@@ -594,7 +582,6 @@ class _SubtopicContentScreenState extends State<SubtopicContentScreen> {
                 ),
               ),
 
-            // 🚀 3. Content List
             _isLoading
                 ? const ContentListShimmer(itemHeight: 76)
                 : filteredItems.isEmpty
@@ -721,7 +708,6 @@ class _ContentActionModal extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Drag Handle
                 Container(
                   width: 40.w,
                   height: 4.h,

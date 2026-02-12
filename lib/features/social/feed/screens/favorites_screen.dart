@@ -58,7 +58,6 @@ class _FavoritesScreenState extends State<FavoritesScreen>
     }
   }
 
-  // Sync tab if category changed externally (e.g. filter sheet)
   void _updateTabFromCategory() {
     if (_selectedCategory == null) {
       _tabController.animateTo(0);
@@ -146,14 +145,12 @@ class _FavoritesScreenState extends State<FavoritesScreen>
 
                     List<PostModel> posts = postSnapshot.data ?? [];
 
-                    // Apply Category Filter
                     if (_selectedCategory != null) {
                       posts = posts
                           .where((p) => p.category == _selectedCategory)
                           .toList();
                     }
 
-                    // Apply Sorting
                     posts.sort((a, b) {
                       switch (_selectedSort) {
                         case PostSort.latest:

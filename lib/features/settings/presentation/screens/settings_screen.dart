@@ -35,7 +35,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = "";
 
-  // State
   String? _selectedLanguage;
   String? _selectedMedium;
   String? _selectedGradeId;
@@ -201,7 +200,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (_searchQuery.isEmpty) return sections;
 
-    // Very simple filtering logic for demonstration
     return sections.where((section) {
       return section.toString().toLowerCase().contains(_searchQuery);
     }).toList();
@@ -505,7 +503,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // --- Logic Helpers (Keep existing logic) ---
   String _getLanguageName() => _appLanguages.firstWhere(
     (l) => l['code'] == _selectedLanguage,
     orElse: () => {'nativeName': 'English'},

@@ -29,7 +29,6 @@ import 'package:math/features/social/feed/services/cache_service.dart';
 import 'package:math/features/social/feed/services/download_service.dart';
 import 'package:math/core/widgets/download_progress_dialog.dart';
 
-/// A Twitter-style post widget
 class TweetPostWidget extends StatefulWidget {
   final PostModel post;
   final VoidCallback? onTap;
@@ -53,10 +52,7 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
   int _shareCount = 0;
   bool _isFavorited = false;
   bool _isExpanded = false;
-  // int _viewCount = 0; // Not displaying view count real-time update to avoid spam, using constant from model initially
 
-  // Helper to get the actual post to display/interact with
-  // If this is a direct repost (no text), we interact with the original.
   PostModel get _effectivePost {
     if (widget.post.isReShare &&
         widget.post.text.isEmpty &&
@@ -76,7 +72,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
     _checkIfLiked();
     _checkIfFavorited();
 
-    // Increment View Count on load (simple approach)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       SocialService().incrementViewCount(_effectivePost.postId);
     });
@@ -248,11 +243,9 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
   }
 
   Future<void> _handleShare() async {
-    // 1. Increment Share Count
     setState(() => _shareCount++);
     await SocialService().incrementShareCount(_effectivePost.postId);
 
-    // 2. Open Share Sheet
     final url =
         'https://yourapp.com/post/${_effectivePost.postId}'; // Deep link placeholder
 
@@ -329,7 +322,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
         widget.post.imageUrl == null;
     final reposterName = widget.post.authorName;
 
-    // Check if empty photoURL string
     final photoUrl = post.authorPhotoUrl;
     final hasPhoto = photoUrl != null && photoUrl.isNotEmpty;
     final bgColor = AvatarColorGenerator.getColorForUser(post.authorId);
@@ -368,7 +360,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- Repost Header (X.com Style) ---
             if (isDirectRepost)
               Padding(
                 padding: EdgeInsets.only(
@@ -396,7 +387,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // --- Avatar Section ---
                 GestureDetector(
                   onTap: () {
                     showModalBottomSheet(
@@ -413,7 +403,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                     height: 44.r,
                     child: Stack(
                       children: [
-                        // --- User Photo (Centered) ---
                         Align(
                           alignment: post.communityId != null
                               ? Alignment.bottomRight
@@ -449,7 +438,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                             ),
                           ),
                         ),
-                        // --- Community Photo (Top Left - On Top) ---
                         if (post.communityId != null)
                           Positioned(
                             top: 0,
@@ -490,12 +478,10 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                 ),
                 SizedBox(width: 12.w),
 
-                // --- Content Column ---
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // --- Header: Name, Handle, Time ---
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -554,7 +540,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                // 🚀 POPUP MENU
                                 InkWell(
                                   onTap: () {
                                     final currentUser = context
@@ -680,7 +665,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                                     ),
                                   ),
                                 ),
-                                // 🚀 Header Join Button
                                 if (post.communityId != null ||
                                     post.originalPost?.communityId != null)
                                   Builder(
@@ -693,7 +677,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                                           ? post
                                           : post.originalPost!;
 
-                                      // If not logged in, show join button (will prompt login on tap)
                                       if (user == null) {
                                         return Padding(
                                           padding: EdgeInsets.only(top: 4.h),
@@ -711,8 +694,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                                           user.uid,
                                         ),
                                         builder: (context, snapshot) {
-                                          // Hide while loading or if already a member
-
                                           if (snapshot.connectionState ==
                                                   ConnectionState.waiting ||
                                               (snapshot.data ?? false)) {
@@ -738,7 +719,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
 
                       SizedBox(height: 4.h),
 
-                      // --- Body Text ---
                       if (post.text.isNotEmpty)
                         (widget.isMinimal && !_isExpanded)
                             ? Text(
@@ -764,7 +744,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                                 ),
                               ),
 
-                      // 🚀 Formal Link Attachment
                       if (post.linkUrl != null &&
                           (!widget.isMinimal || _isExpanded))
                         Padding(
@@ -820,7 +799,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                           ),
                         ),
 
-                      // 🚀 Subject & Category Badges
                       if ((post.subjectName != null ||
                               post.tags.isNotEmpty ||
                               post.category != PostCategory.general) &&
@@ -946,7 +924,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                           ),
                         ),
 
-                      // 🚀 Helpful Answer Indicator
                       if (post.helpfulAnswerCount > 0 &&
                           (!widget.isMinimal || _isExpanded))
                         Padding(
@@ -971,7 +948,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                           ),
                         ),
 
-                      // --- Media (Images) ---
                       if ((post.imageUrls.isNotEmpty ||
                               post.imageUrl != null) &&
                           (!widget.isMinimal || _isExpanded))
@@ -980,7 +956,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                           child: _buildTweetImages(context, post),
                         ),
 
-                      // --- Poll ---
                       if (post.pollData != null &&
                           (!widget.isMinimal || _isExpanded))
                         PollWidget(
@@ -988,7 +963,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                           pollData: post.pollData!,
                         ),
 
-                      // --- Quoted Post Preview ---
                       if (!isDirectRepost &&
                           widget.post.originalPost != null &&
                           (!widget.isMinimal || _isExpanded))
@@ -1001,14 +975,12 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                           ),
                         ),
 
-                      // --- Actions Row ---
                       if (!widget.isMinimal || _isExpanded)
                         Padding(
                           padding: EdgeInsets.only(top: 12.h, right: 8.w),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              // Reply
                               _ActionButton(
                                 icon: Iconsax.messages_2_outline,
                                 label: post.replyCount > 0
@@ -1034,7 +1006,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                                   );
                                 },
                               ),
-                              // Repost
                               if (!post.resharingDisabled)
                                 _ActionButton(
                                   icon: Iconsax.repeat_outline,
@@ -1044,7 +1015,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                                   activeColor: Colors.green,
                                   onTap: _handleReShare,
                                 ),
-                              // Like
                               _ActionButton(
                                 icon: _isLiked
                                     ? Iconsax.heart_bold
@@ -1056,7 +1026,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                                 activeColor: Colors.pinkAccent,
                                 onTap: _toggleLike,
                               ),
-                              // Views
                               _ActionButton(
                                 icon: Iconsax.chart_outline,
                                 label: widget.post.viewCount > 0
@@ -1065,7 +1034,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                                 activeColor: Colors.blue,
                                 onTap: () {},
                               ),
-                              // Share
                               if (!post.sharingDisabled)
                                 _ActionButton(
                                   icon: Iconsax.export_3_outline,
@@ -1077,7 +1045,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                           ),
                         ),
 
-                      // 🚀 Show "See More" / "Show Less" indicator
                       if (widget.isMinimal)
                         Builder(
                           builder: (context) {
@@ -1195,7 +1162,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final double width = constraints.maxWidth;
-        // 🚀 Calculate Golden Height for the section
         final double goldenHeight = width / phi;
 
         if (hasVideo && urls.isEmpty) {
@@ -1219,7 +1185,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
             height: goldenHeight,
             child: Builder(
               builder: (context) {
-                // Case 1: Video + 1 Image or just 2 Images
                 if (hasVideo && urls.length == 1) {
                   return Row(
                     children: [
@@ -1240,7 +1205,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                   );
                 }
 
-                // Case 2: Video + 2 Images or just 3 Images
                 if (hasVideo && urls.length == 2) {
                   return Row(
                     children: [
@@ -1277,7 +1241,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                   );
                 }
 
-                // Case 3: Video + 3 Images or 4+ images
                 return Row(
                   children: [
                     Expanded(
@@ -1373,7 +1336,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: Author & Community
             Row(
               children: [
                 SizedBox(
@@ -1381,7 +1343,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                   height: 32.r,
                   child: Stack(
                     children: [
-                      // User Photo (Base - Bottom Right if Community)
                       Align(
                         alignment: post.communityId != null
                             ? Alignment.bottomRight
@@ -1407,7 +1368,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                               : null,
                         ),
                       ),
-                      // Community Photo (Top Left - On Top)
                       if (post.communityId != null)
                         Positioned(
                           top: 0,
@@ -1457,12 +1417,10 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                // 🚀 Header Join Button
                 if (post.communityId != null)
                   Builder(
                     builder: (context) {
                       final user = context.read<AuthService>().user;
-                      // If not logged in, show join button (will prompt login on tap)
                       if (user == null) {
                         return Padding(
                           padding: EdgeInsets.only(left: 8.w),
@@ -1476,7 +1434,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                           user.uid,
                         ),
                         builder: (context, snapshot) {
-                          // Show button with correct state
                           final isJoined = snapshot.data ?? false;
 
                           if (snapshot.connectionState ==
@@ -1500,7 +1457,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
               ],
             ),
 
-            // 🚀 Category, Subject, Tags Row
             if (post.subjectId != null ||
                 post.category != PostCategory.general ||
                 post.tags.isNotEmpty)
@@ -1590,7 +1546,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                 ),
               ),
 
-            // 🚀 Helpful Answer Indicator
             if (post.helpfulAnswerCount > 0)
               Padding(
                 padding: EdgeInsets.only(top: 8.h),
@@ -1621,7 +1576,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                 ),
               ),
 
-            // Quoted Poll Summary
             if (post.pollData != null)
               Container(
                 margin: EdgeInsets.only(top: 8.h),
@@ -1684,7 +1638,6 @@ class _TweetPostWidgetState extends State<TweetPostWidget> {
                 ),
               ),
 
-            // Quoted Media Preview
             if (post.imageUrls.isNotEmpty ||
                 post.imageUrl != null ||
                 post.videoUrl != null)

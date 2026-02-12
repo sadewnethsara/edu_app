@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:math/core/models/content_model.dart'; // Make sure this is imported
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// A data class to hold all info needed to resume
 class ContinueLearningData {
   final String gradeId;
   final String subjectId;
@@ -68,7 +67,6 @@ class ContinueLearningService extends ChangeNotifier {
 
   ContinueLearningData? get lastViewedData => _lastViewedData;
 
-  // Call this in main.dart
   Future<void> initialize() async {
     await _loadFromPrefs();
   }
@@ -82,7 +80,6 @@ class ContinueLearningService extends ChangeNotifier {
           json.decode(jsonString),
         );
       } catch (e) {
-        // Data format might be old/corrupt, clear it
         await prefs.remove(_key);
         _lastViewedData = null;
       }
